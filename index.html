@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="utf-8">
+    <title>Localization</title>
+  </head>
+
+  <body>
+    <button type="button" onclick="findMe()" name="button">Ubicarme!</button>
+    <div id="map">
+
+    </div>
+    <script type="text/javascript">
+      function findMe() {
+        var output = document.getElementById('map');
+
+        /*Se valida si el navegador permite Geolocalizacion*/
+        if (navigator.geolocation) {
+          output.innerHTML = '<p> El Navegador soporta Geolocalizacion </p>';
+        } else {
+          output.innerHTML = '<p> El Navegador No soporta Geolocalizacion </p>';
+        }
+
+        /*Funcion que se pasa como parametro para obtener los valores de Geolocalizacion*/
+        function location(position) {
+          var latitude = position.coords.latitude;
+          var longitude = position.coords.longitude;
+
+          output.innerHTML = "<p>latitude = " + latitude + "  longitude = " + longitude + " </p>";
+        }
+
+        function error() {
+          output.innerHTML = "<p>No se pudo obtener la ubicacion </p>";
+        }
+
+        /*Obtener la Geolocalizacion proporcionada por el navegador*/
+        navigator.geolocation.getCurrentPosition(location, console.error);
+
+
+      }
+
+    </script>
+  </body>
+
+</html>
