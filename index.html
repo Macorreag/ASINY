@@ -4,9 +4,48 @@
   <head>
     <meta charset="utf-8">
     <title>Localization</title>
+    <style>
+      html,
+      body {
+        font-family: Arial, sans-serif;
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+
+      #map {
+        height: 100%;
+      }
+
+    </style>
   </head>
 
   <body>
+
+    <div id="map"></div>
+    <script>
+      var map;
+
+      function initMap() {
+        // Constructor creates a new map - only center and zoom are required.
+        map = new google.maps.Map(document.getElementById('map'), {
+          /*Aqui vive el mapa,se maneja dentro de la clase google.maps*/
+          center: {
+            lat: 40.7413549,
+            lng: -73.9980244
+          },
+          zoom: 13
+          /*29 niveles de zoom para iniciar la vista*/
+        });
+      }
+
+    </script>
+    <!--Cargar la API de google maps de forma Asincrona*/-->
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCcVSzMvDoSRvr9RUUIjrLLJ1HjTrUBKcg&v=3&callback=initMap">
+
+
+    </script>
+
     <button type="button" onclick="findMe()" name="button">Ubicarme!</button>
     <div id="map">
 
