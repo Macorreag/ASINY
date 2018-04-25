@@ -1,0 +1,30 @@
+data.gov -> datos abiertos 
+
+Innovacion con los datos abiertos
+
+Bootstrap
+
+
+-> Mapas PI mashup
+	(Renderizacion y rutas)
+->Visualización de datos 
+	D3.js  y C3.js
+->UX
+	Acceso de usuario Problema
+
+Premios (Subpremios de a 30)
+
+5 Etapas (Iteraciones)(3 dias programando )(2 dias evaluacion )
+->
+->
+->
+->
+
+Rules
+->Iteracion minimo un commit o se descalifica
+->Es individual
+->Open Code
+->
+
+
+

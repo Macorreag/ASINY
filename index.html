@@ -3,26 +3,19 @@
 
   <head>
     <meta charset="utf-8">
+    <link rel="StyleSheet" href="css/style.css" type="text/css">
+    <!--llamado a bootstrap 4 version min aún no se hace necesario Jquery asi que no se ha llamado-->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css" integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4" crossorigin="anonymous">
+
     <title>Localization</title>
     <style>
-      html,
-      body {
-        font-family: Arial, sans-serif;
-        height: 100%;
-        margin: 0;
-        padding: 0;
-      }
-
-      #map {
-        height: 100%;
-      }
 
     </style>
   </head>
 
   <body>
 
-    <div id="map"></div>
+
     <script>
       var map;
 
@@ -142,49 +135,65 @@
           title: 'First Marker!'
           /*Texto mostrado onHover*/
         });
+
+        /*Probando los circulos en el mapa*/
+        var cityCircle = new google.maps.Circle({
+          strokeColor: '#FF0000',
+      strokeOpacity: 0.8,
+      strokeWeight: 2,
+      fillColor: '#FF0000',
+      fillOpacity: 0.35,
+      map: map,
+      center: tribeca,
+      radius: 6 * 100,
+      editable: true
+    });
+
+
+
       }
 
     </script>
     <!--Cargar la API de google maps de forma Asincrona*/-->
     <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCcVSzMvDoSRvr9RUUIjrLLJ1HjTrUBKcg&v=3&callback=initMap">
-
-
     </script>
 
-    <button type="button" onclick="findMe()" name="button">Ubicarme!</button>
-    <div id="map">
 
+
+    <div class="singlePage container-fluid ">
+      <div class="row">
+        <div id="map" class="col-md-12 ">
+
+        </div>
+        <div class="row overlayA">
+
+          <div class="col-md-3" style="background-color:black">
+              Columna 1
+Columna 1Columna
+  <hr>
+  <hr>
+  <hr>
+
+  <hr>
+  <hr>
+
+  <hr><hr>
+
+  <hr>
+          </div>
+          <div class="col-md-6" style="background-color:red">
+            Columna 2
+
+
+          </div>
+          <div class="col-md-3" style="background-color:blue,display:none">
+            Columna 3
+
+          </div>
+        </div>
+
+      </div>
     </div>
-    <script type="text/javascript">
-      function findMe() {
-        var output = document.getElementById('map');
-
-        /*Se valida si el navegador permite Geolocalizacion*/
-        if (navigator.geolocation) {
-          output.innerHTML = '<p> El Navegador soporta Geolocalizacion </p>';
-        } else {
-          output.innerHTML = '<p> El Navegador No soporta Geolocalizacion </p>';
-        }
-
-        /*Funcion que se pasa como parametro para obtener los valores de Geolocalizacion*/
-        function location(position) {
-          var latitude = position.coords.latitude;
-          var longitude = position.coords.longitude;
-
-          output.innerHTML = "<p>latitude = " + latitude + "  longitude = " + longitude + " </p>";
-        }
-
-        function error() {
-          output.innerHTML = "<p>No se pudo obtener la ubicacion </p>";
-        }
-
-        /*Obtener la Geolocalizacion proporcionada por el navegador*/
-        navigator.geolocation.getCurrentPosition(location, console.error);
-
-
-      }
-
-    </script>
   </body>
 
 </html>

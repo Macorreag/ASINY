@@ -1,0 +1,24 @@
+/* Always set the map height explicitly to define the size of the div
+ * element that contains the map. */
+#map {
+  height: 50vw;
+  min-height: 500px;
+}
+/* Optional: Makes the sample page fill the window. */
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+.singlePage{
+  height: 1000;
+}
+
+.overlayA{
+  width: 100%;
+    position: absolute;
+    margin: 0;
+    padding: 0;
+    
+}
