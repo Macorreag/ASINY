@@ -1,29 +1,32 @@
 /* Always set the map height explicitly to define the size of the div
 * element that contains the map. */
 #map {
-  height: 100%;
+    height: 100%;
     width: 100%;
+    margin: 0;
     padding: 0;
 }
 /* Optional: Makes the sample page fill the window. */
 html, body {
-  background-color: blue;
+/*  background-color: blue;
   height: 100%;
   margin: 0;
   padding: 0;
-  width: 100%;
+  width: 100%;*/
 }
 .medium{
 
   background-color: "green";
 }
 .panel{
-    background-color: "blue";
+    background-color: rgba(8, 8, 8, 0.6);
+
+    color: rgb(255, 255, 255);
 }
+
 .overlayA{
   position: absolute;
-  margin: 0;
-  padding: 0;
+
 
 }
 .singlePage{
