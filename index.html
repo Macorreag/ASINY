@@ -1,199 +1,71 @@
 <!DOCTYPE html>
+
+<!--sweet alert Para alert bonitas-->
 <html lang="en">
 
-  <head>
-    <meta charset="utf-8">
-    <link rel="StyleSheet" href="css/style.css" type="text/css">
-    <!--llamado a bootstrap 4 version min aún no se hace necesario Jquery asi que no se ha llamado-->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css" integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4" crossorigin="anonymous">
-
-    <title>Localization</title>
-    <style>
-
-    </style>
-  </head>
-
-  <body>
+<head>
+  <meta charset="utf-8">
+  <!--Se llama Jquery -->
+  <script  src="http://code.jquery.com/jquery-3.3.1.min.js"  integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="  crossorigin="anonymous"></script>
+  <link rel="StyleSheet" href="css/style.css" type="text/css" >
+  <!--Se puede definir los tipos de estilos para cada pantalla especifica media="screen and (device-height: 600px)" -->
+  <!--llamado a bootstrap 4 version min -->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css" integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4" crossorigin="anonymous">
 
 
-    <script>
-      var map;
+  <title>Your District</title>
+  <style>
 
-      var markers = [];
-      /*Matriz que contiene los marcaadores para posicionar en el mapa*/
-      function initMap() {
-        // Constructor creates a new map - only center and zoom are required.
-        map = new google.maps.Map(document.getElementById('map'), {
-          /*Aqui vive el mapa,se maneja dentro de la clase google.maps*/
-          center: {
-            lat: 40.7413549,
-            lng: -73.9980244
-          },
-          zoom: 13
-          /*29 niveles de zoom para iniciar la vista*/
-        });
+  </style>
+</head>
 
-        // These are the real estate listings that will be shown to the user.
-        // Normally we'd have these in a database instead.
-        /*Podriamos traer aca los DataSets para mostrar en el Mapa*/
-        var locations = [{
-            title: 'Park Ave Penthouse',
-            location: {
-              lat: 40.7713024,
-              lng: -73.9632393
-            }
-          },
-          {
-            title: 'Chelsea Loft',
-            location: {
-              lat: 40.7444883,
-              lng: -73.9949465
-            }
-          },
-          {
-            title: 'Union Square Open Floor Plan',
-            location: {
-              lat: 40.7347062,
-              lng: -73.9895759
-            }
-          },
-          {
-            title: 'East Village Hip Studio',
-            location: {
-              lat: 40.7281777,
-              lng: -73.984377
-            }
-          },
-          {
-            title: 'TriBeCa Artsy Bachelor Pad',
-            location: {
-              lat: 40.7195264,
-              lng: -74.0089934
-            }
-          },
-          {
-            title: 'Chinatown Homey Space',
-            location: {
-              lat: 40.7180628,
-              lng: -73.9961237
-            }
-          }
-        ];
+<body>
 
 
 
-        var largeInfowindow = new google.maps.InfoWindow();
-        var bounds = new google.maps.LatLngBounds();
-
-        // Thabre el  e following group uses the location array to create an array of markers on initialize.
-        for (var i = 0; i < locations.length; i++) {
-          // Get the position from the location array.
-          var position = locations[i].location;
-          var title = locations[i].title;
-          // Create a marker per location, and put into markers array.
-          var marker = new google.maps.Marker({
-            map: map,
-            position: position,
-            title: title,
-            animation: google.maps.Animation.DROP,
-            //animacion como ingresaran los markadores al mapa
-            id: i
-          });
-          // Push the marker to our array of markers.
-          markers.push(marker);
-          // Create an onclick event to open an infowindow at each marker.
-          marker.addListener('click', function() {
-            populateInfoWindow(this, largeInfowindow);
-          });
-          bounds.extend(markers[i].position);
-        }
 
 
-        map.fitBounds(bounds);
+<!--Espacido en bootstrap offset-md-4 deja el espaciado en el container respecto a la grilla -->
+<!--col-sm-6 Subdivicion NESTING dentro de un container de 12-->
 
-        function populateInfoWindow(marker, infowindow) {
-          // Check to make sure the infowindow is not already opened on this marker.
-          if (infowindow.marker != marker) {
-            infowindow.marker = marker;
-            infowindow.setContent('<div>' + marker.title + '</div>');
-            infowindow.open(map, marker);
-            // Make sure the marker property is cleared if the infowindow is closed.
-            infowindow.addListener('closeclick', function() {
-              infowindow.setMarker = null;
-            });
-          }
-        }
-        var tribeca = {
-          /*Posicion del marker*/
-          lat: 40.719526,
-          lng: -74.0089934
-        };
-        var marker = new google.maps.Marker({
-          position: tribeca,
-          map: map,
-          /*Mapa donde se colocara el marker*/
-          title: 'First Marker!'
-          /*Texto mostrado onHover*/
-        });
+<div id="map" class="container-fluid overlayA"></div>
+<!--Si se quita el overlay se acomoda para telefonos-->
+<div class="row  ">
 
-        /*Probando los circulos en el mapa*/
-        var cityCircle = new google.maps.Circle({
-          strokeColor: '#FF0000',
-      strokeOpacity: 0.8,
-      strokeWeight: 2,
-      fillColor: '#FF0000',
-      fillOpacity: 0.35,
-      map: map,
-      center: tribeca,
-      radius: 6 * 100,
-      editable: true
-    });
+  <div class="col-3 col-md-3 ">
 
+    .col-6 .col-md-4</div>
 
-
-      }
-
-    </script>
-    <!--Cargar la API de google maps de forma Asincrona*/-->
-    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCcVSzMvDoSRvr9RUUIjrLLJ1HjTrUBKcg&v=3&callback=initMap">
-    </script>
-
-
-
-    <div class="singlePage container-fluid ">
-      <div class="row">
-        <div id="map" class="col-md-12 ">
-
-        </div>
-        <div class="row overlayA">
-
-          <div class="col-md-3" style="background-color:black">
-              Columna 1
-Columna 1Columna
-  <hr>
-  <hr>
-  <hr>
-
-  <hr>
-  <hr>
-
-  <hr><hr>
-
-  <hr>
-          </div>
-          <div class="col-md-6" style="background-color:red">
-            Columna 2
-
-
-          </div>
-          <div class="col-md-3" style="background-color:blue,display:none">
-            Columna 3
-
-          </div>
-        </div>
-
+    <div class="col-6 col-md-6 panel">
+      <div class="btn-group btn-group-toggle" data-toggle="buttons">
+        <label class="btn btn-primary  active">
+          <input type="radio" name="options" id="option1" autocomplete="off" checked> Active
+        </label>
+        <label class="btn btn-primary">
+          <input type="radio" name="options" id="option2" autocomplete="off"> Radio
+        </label>
+        <label class="btn btn-primary">
+          <input type="radio" name="options" id="option3" autocomplete="off"> Radio
+        </label>
       </div>
+      <br>
+      .col-6 .col-md-4
     </div>
-  </body>
 
-</html>
+
+      <div class="col-3 col-md-3 panel">
+
+        .col-6 .col-md-4</div>
+      </div>
+
+
+
+
+      <!--Cargamos de ultimas el javascript para no interrumpir la carga de la pagina-->
+      <script type="text/javascript" src="js/index.js"></script>
+      <!--Cargar la API de google maps de forma Asincrona*/-->
+      <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCcVSzMvDoSRvr9RUUIjrLLJ1HjTrUBKcg&v=3&callback=initMap">
+      </script>
+    </body>
+
+    </html>
