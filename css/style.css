@@ -6,29 +6,11 @@
     margin: 0;
     padding: 0;
 }
-/* Optional: Makes the sample page fill the window. */
-html, body {
-/*  background-color: blue;
-  height: 100%;
-  margin: 0;
-  padding: 0;
-  width: 100%;*/
-}
-.medium{
-
-  background-color: "green";
-}
 .panel{
-    background-color: rgba(8, 8, 8, 0.6);
-
+    background: linear-gradient(to right, rgba(0, 0, 0, 0.6 ) , rgba(19, 47, 196, 0.6));
     color: rgb(255, 255, 255);
 }
-
-.overlayA{
-  position: absolute;
-
-
-}
-.singlePage{
-  /*height: 1000;*/
+.dropdown{
+  display: inline;
+  height: 100%;
 }

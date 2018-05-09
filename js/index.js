@@ -1,20 +1,19 @@
-const coorUniversity={lat:40.7291, lng:73.9965 };
-$(".negrito").off(event);
-var map;
+const coordUniversity={lat:40.7291, lng:-73.9965 };
 
+
+var map;
 var markers = [];
 /*Matriz que contiene los marcaadores para posicionar en el mapa*/
 function initMap() {
   // Constructor creates a new map - only center and zoom are required.
   map = new google.maps.Map(document.getElementById('map'), {
     /*Aqui vive el mapa,se maneja dentro de la clase google.maps*/
-    center: {
-      lat: 40.7291,
-      lng: 73.9965
-    },
-    zoom: 19
+    center: coordUniversity,
+    zoom: 11
     /*29 niveles de zoom para iniciar la vista*/
   });
+
+
 
   // These are the real estate listings that will be shown to the user.
   // Normally we'd have these in a database instead.
@@ -106,32 +105,27 @@ function populateInfoWindow(marker, infowindow) {
     });
   }
 }
-var tribeca = {
-  /*Posicion del marker*/
-  lat: 40.719526,
-  lng: -74.0089934
+
+var image = {
+  url: 'https://i.imgur.com/QDsm8jB.png',
+  size: new google.maps.Size(45, 45),
+  origin: new google.maps.Point(0, 0),
+  anchor: new google.maps.Point(25,45 )
 };
-var marker = new google.maps.Marker({
-  position: tribeca,
-  map: map,
-  /*Mapa donde se colocara el marker*/
-  title: 'First Marker!'
-  /*Texto mostrado onHover*/
-});
+setMarker(image,coordUniversity,'NYC University');
 
-/*Probando los circulos en el mapa*/
-var cityCircle = new google.maps.Circle({
-  strokeColor: '#FF0000',
-  strokeOpacity: 0.8,
-  strokeWeight: 2,
-  fillColor: '#31E7FB',
-  fillOpacity: 0.35,
-  map: map,
-  center: tribeca,
-  radius: 20 * 100,
-  //editable: true
-});
+}
 
 
 
+function setMarker(image,coordinates,textHover) {
+        var marker = new google.maps.Marker({
+          position:coordinates,
+          map: map,
+          /*Mapa donde se colocara el marker*/
+          icon: image,
+          title: textHover,
+          /*Texto mostrado onHover*/
+          zIndex: 100
+        });
 }
