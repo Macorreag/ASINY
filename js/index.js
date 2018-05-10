@@ -1,8 +1,116 @@
-const coordUniversity={lat:40.7291, lng:-73.9965 };
+/*DataSets URl*/
+const NAMESNEIGHBORHOOD ="https://data.cityofnewyork.us/api/views/xyye-rtrs/rows.json?accessType=DOWNLOAD";
+const SHAPEDISTRICT = "https://services5.arcgis.com/GfwWNkhOj9bNBqoJ/arcgis/rest/services/nycd/FeatureServer/0/query?where=1=1&outFields=*&outSR=4326&f=geojson"
+const BOROUGHTS_NAMES = ["Manhattan", "The Bronx", "Brooklyn", "Queens", "Staten Island"];
 
-
+const coordUniversity={lat:40.7291, lng:-73.9965 }; /*Position University*/
+/*JSON filtered */
+var infoRows = [];
+var nbInfo = [];
+/*Variables for GMaps*/
 var map;
 var markers = [];
+
+class Neighborhood {
+  /*Neighborhood in the 5 district */
+  constructor(name,coorCenter,district,coordLimits,habitable) {
+    this._name = name;
+    this._coorCenter = coorCenter;/*Acomodar para si recibe POINT lo organize*/
+    this._district = district;
+    this._coordLimits = coordLimits;
+    this._habitable = habitable;
+    this._color = "#111111"; /*Dejar ramdom dentro del costructor para luego usar*/
+  }
+  get name() {
+    return this._name;
+  }
+
+  get coorCenter(){
+    return this._coorCenter;
+  }
+
+  get district(){
+    return this._district;
+  }
+
+  get coordLimits(){
+    return this._coordLimits;
+  }
+
+  get habitable(){
+    return this._habitable;
+  }
+
+}
+
+
+function getDataNeighborhood(URL){
+  /*Como parametro podria tener la URL */
+  var data = $.get(URL,function(){})
+  .done(function(){
+    for(var i = 0 ;i < data.responseJSON.data.length ;i++){
+      var neighborhood = new Neighborhood(
+        data.responseJSON.data[i][10],
+        data.responseJSON.data[i][9],
+        data.responseJSON.data[i][16],
+        "", /*Tem*/
+        "True" /*Tem*/
+      );
+      infoRows.push(neighborhood);
+      /*Make object with contains of DataSets*/
+    }
+    console.log(infoRows);/*
+    var tableReference = $("#city")[0];
+    var newRow, state, deaths, year;
+    for(var i = 0;i <infoRows.length;i++){
+      newRow = tableReference.insertRow(tableReference.rows.length);
+      state = newRow.insertCell()
+      deaths = newRow.insertCell();
+      year =  newRow.insertCell();
+      state.innerHTML = infoRows[i][0];
+      deaths.innerHTML = infoRows[i][1];
+      year.innerHTML = infoRows[i][2]
+    }
+    /*console.log(data.responseJSON.data.filter(function (n){
+      if(1==1){
+
+      }
+      return n[16][0]  ;
+    }));
+    */
+/*
+    for(var i = 0 ;i < data.responseJSON.data.length ;i++){
+      infoRows.push([data.responseJSON.data[i][8],data.responseJSON.data[i][13],data.responseJSON.data[i][9]]);
+      /*Primera Fila con el contenido de la row 8 del data set*/
+    /*}
+    var tableReference = $(".table")[0];
+    var newRow, state, deaths, year;
+    for(var i = 0;i <infoRows.length;i++){
+      newRow = tableReference.insertRow(tableReference.rows.length);
+      state = newRow.insertCell()
+      deaths = newRow.insertCell();
+      year =  newRow.insertCell();
+      state.innerHTML = infoRows[i][0];
+      deaths.innerHTML = infoRows[i][1];
+      year.innerHTML = infoRows[i][2]
+    }
+    console.log(infoRows);
+    */
+  })
+  .fail(function(error){
+    console.log(error);
+  })
+}
+
+
+$("document").ready(function(){
+  getDataShapeDistric(SHAPEDISTRICT);
+});
+
+
+
+
+
 /*Matriz que contiene los marcaadores para posicionar en el mapa*/
 function initMap() {
   // Constructor creates a new map - only center and zoom are required.
@@ -13,98 +121,6 @@ function initMap() {
     /*29 niveles de zoom para iniciar la vista*/
   });
 
-
-
-  // These are the real estate listings that will be shown to the user.
-  // Normally we'd have these in a database instead.
-  /*Podriamos traer aca los DataSets para mostrar en el Mapa*/
-  var locations = [{
-    title: 'Park Ave Penthouse',
-    location: {
-      lat: 40.7713024,
-      lng: -73.9632393
-    }
-  },
-  {
-    title: 'Chelsea Loft',
-    location: {
-      lat: 40.7444883,
-      lng: -73.9949465
-    }
-  },
-  {
-    title: 'Union Square Open Floor Plan',
-    location: {
-      lat: 40.7347062,
-      lng: -73.9895759
-    }
-  },
-  {
-    title: 'East Village Hip Studio',
-    location: {
-      lat: 40.7281777,
-      lng: -73.984377
-    }
-  },
-  {
-    title: 'TriBeCa Artsy Bachelor Pad',
-    location: {
-      lat: 40.7195264,
-      lng: -74.0089934
-    }
-  },
-  {
-    title: 'Chinatown Homey Space',
-    location: {
-      lat: 40.7180628,
-      lng: -73.9961237
-    }
-  }
-];
-
-
-
-var largeInfowindow = new google.maps.InfoWindow();
-var bounds = new google.maps.LatLngBounds();
-
-// Thabre el  e following group uses the location array to create an array of markers on initialize.
-for (var i = 0; i < locations.length; i++) {
-  // Get the position from the location array.
-  var position = locations[i].location;
-  var title = locations[i].title;
-  // Create a marker per location, and put into markers array.
-  var marker = new google.maps.Marker({
-    map: map,
-    position: position,
-    title: title,
-    animation: google.maps.Animation.DROP,
-    //animacion como ingresaran los markadores al mapa
-    id: i
-  });
-  // Push the marker to our array of markers.
-  markers.push(marker);
-  // Create an onclick event to open an infowindow at each marker.
-  marker.addListener('click', function() {
-    populateInfoWindow(this, largeInfowindow);
-  });
-  bounds.extend(markers[i].position);
-}
-
-
-map.fitBounds(bounds);
-
-function populateInfoWindow(marker, infowindow) {
-  // Check to make sure the infowindow is not already opened on this marker.
-  if (infowindow.marker != marker) {
-    infowindow.marker = marker;
-    infowindow.setContent('<div>' + marker.title + '</div>');
-    infowindow.open(map, marker);
-    // Make sure the marker property is cleared if the infowindow is closed.
-    infowindow.addListener('closeclick', function() {
-      infowindow.setMarker = null;
-    });
-  }
-}
 
 var image = {
   url: 'https://i.imgur.com/QDsm8jB.png',
@@ -117,6 +133,7 @@ setMarker(image,coordUniversity,'NYC University');
 }
 
 
+/*Functions for Google Maps*/
 
 function setMarker(image,coordinates,textHover) {
         var marker = new google.maps.Marker({
@@ -125,7 +142,7 @@ function setMarker(image,coordinates,textHover) {
           /*Mapa donde se colocara el marker*/
           icon: image,
           title: textHover,
-          /*Texto mostrado onHover*/
+          /*Text show in event Hover*/
           zIndex: 100
         });
 }

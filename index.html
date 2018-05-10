@@ -11,13 +11,16 @@
   <!--Se puede definir los tipos de estilos para cada pantalla especifica media="screen and (device-height: 600px)" -->
   <!--llamado a bootstrap 4 version min -->
   <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous">
-  <script  src="https://code.jquery.com/jquery-3.3.1.slim.min.js"  integrity="sha256-3edrmyuQ0w65f8gfBsqowzjJe2iM6n0nKciPUp8y+7E="  crossorigin="anonymous"></script>
+  <script
+  src="https://code.jquery.com/jquery-3.3.1.js"
+  integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60="
+  crossorigin="anonymous"></script>
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js" integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T" crossorigin="anonymous"></script>
-  <link rel="StyleSheet" href="css/style.css" type="text/css" >
+  <link rel="StyleSheet" href="style.css" type="text/css" >
 
 
 
-  <title>Your District</title>
+  <title>ASINY</title>
   <style>
 
   </style>
@@ -36,17 +39,17 @@
   <div class="container-fluid">
     <div class="row justify-content-between">
       <div class="col-3 panel">
-        <div class="col-md-8 ">
+          <p>Mira, se me ocurre que podrías hacerlo de esta manera: dentro de cada una de tus columnas metes una fila (row) y le dices que ocupen todo el espacio (col-md-12) y dentro de la fila donde quieres el espacio le añades un padding con la cantidad de separación que quieres, esto último te sugiero hacerlo mediante un media query en tu hoja de estilos ya que no vas a poder controlarlo mediante alguna clase especial para que se acomode todo correctamente en dispositivos móviles, prueba este código y te va quedar mas claro:</p>
+        <div class="col-md-10">
           <div class="  margin-top-sm">
-            <div class="title"><strong>Basic Table</strong></div>
+            <div class="title"><strong>Ranking</strong></div>
             <div class="table-responsive">
-              <table class="table">
+              <table id="city"class="table">
                 <thead>
                   <tr>
-                    <th>#</th>
-                    <th>First Name</th>
-                    <th>Last Name</th>
-                    <th>Username</th>
+                    <th>Position</th>
+                    <th>District</th>
+                    <th>BoroCD</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -54,54 +57,51 @@
                     <th scope="row">1</th>
                     <td>Mark</td>
                     <td>Otto</td>
-                    <td>@mdo</td>
                   </tr>
                   <tr>
                     <th scope="row">2</th>
                     <td>Jacob</td>
                     <td>Thornton</td>
-                    <td>@fat</td>
                   </tr>
                   <tr>
                     <th scope="row">3</th>
                     <td>Larry</td>
                     <td>the Bird</td>
-                    <td>@twitter</td>
                   </tr>
                 </tbody>
               </table>
             </div>
           </div>
         </div>
-        <p>Mira, se me ocurre que podrías hacerlo de esta manera: dentro de cada una de tus columnas metes una fila (row) y le dices que ocupen todo el espacio (col-md-12) y dentro de la fila donde quieres el espacio le añades un padding con la cantidad de separación que quieres, esto último te sugiero hacerlo mediante un media query en tu hoja de estilos ya que no vas a poder controlarlo mediante alguna clase especial para que se acomode todo correctamente en dispositivos móviles, prueba este código y te va quedar mas claro:</p>
-        <p>Mira, se me ocurre que podrías hacerlo de esta manera: dentro de cada una de tus columnas metes una fila (row) y le dices que ocupen todo el espacio (col-md-12) y dentro de la fila donde quieres el espacio le añades un padding con la cantidad de separación que quieres, esto último te sugiero hacerlo mediante un media query en tu hoja de estilos ya que no vas a poder controlarlo mediante alguna clase especial para que se acomode todo correctamente en dispositivos móviles, prueba este código y te va quedar mas claro:</p>
+
+
       </div>
       <!-- Example split danger button -->
 <div class="">
   <nav class="navbar navbar-expand-lg navbar-light bg-light">
-    <a class="navbar-brand" href="#">Navbar</a>
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+    <a class="navbar-brand" href="#"><strong>Preferences</strong></a>
+    <button class="navbar-toggler"  type="button" data-toggle="collapse" data-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="navbarNavDropdown">
       <ul class="navbar-nav">
-        <li class="nav-item active">
-          <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
+        <li class="nav-item active" >
+          <a class="nav-link"  href="#">Distance<span class="sr-only">(current)</span></a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="#">Features</a>
+          <a class="nav-link"   href="#">Security</a>
         </li>
-        <li class="nav-item">
+        <li  class="nav-item">
           <a class="nav-link" href="#">Pricing</a>
         </li>
         <li class="nav-item dropdown">
           <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            Dropdown link
+            Means of transport
           </a>
           <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-            <a class="dropdown-item" href="#">Action</a>
-            <a class="dropdown-item" href="#">Another action</a>
-            <a class="dropdown-item" href="#">Something else here</a>
+            <a class="dropdown-item" href="#">Bike</a>
+            <a class="dropdown-item" href="#">walking</a>
+            <a class="dropdown-item" href="#">public transport</a>
           </div>
         </li>
       </ul>
@@ -114,15 +114,16 @@
         <div class="col-3  panel">
           <p>Mira, se me ocurre que podrías hacerlo de esta manera: dentro de cada una de tus columnas metes una fila (row) y le dices que ocupen todo el espacio (col-md-12) y dentro de la fila donde quieres el espacio le añades un padding con la cantidad de separación que quieres, esto último te sugiero hacerlo mediante un media query en tu hoja de estilos ya que no vas a poder controlarlo mediante alguna clase especial para que se acomode todo correctamente en dispositivos móviles, prueba este código y te va quedar mas claro:</p>
           <p>Mira, se me ocurre que podrías hacerlo de esta manera: dentro de cada una de tus columnas metes una fila (row) y le dices que ocupen todo el espacio (col-md-12) y dentro de la fila donde quieres el espacio le añades un padding con la cantidad de separación que quieres, esto último te sugiero hacerlo mediante un media query en tu hoja de estilos ya que no vas a poder controlarlo mediante alguna clase especial para que se acomode todo correctamente en dispositivos móviles, prueba este código y te va quedar mas claro:</p>
-          <p>Mira, se me ocurre que podrías hacerlo de esta manera: dentro de cada una de tus columnas metes una fila (row) y le dices que ocupen todo el espacio (col-md-12) y dentro de la fila donde quieres el espacio le añades un padding con la cantidad de separación que quieres, esto último te sugiero hacerlo mediante un media query en tu hoja de estilos ya que no vas a poder controlarlo mediante alguna clase especial para que se acomode todo correctamente en dispositivos móviles, prueba este código y te va quedar mas claro:</p>
+
         </div>
 
-      </div>
+    </div>
+    </div>
 
 
 
 
-      <script type="text/javascript" src="js/index.js"></script>
+      <script type="text/javascript" src="index.js"></script>
       <!--Cargar la API de google maps de forma Asincrona*/-->
       <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCcVSzMvDoSRvr9RUUIjrLLJ1HjTrUBKcg&v=3&callback=initMap">
       </script>
