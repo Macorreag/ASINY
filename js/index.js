@@ -108,9 +108,45 @@ function getDataShapeDistric( url ){
 			);
 			geoCD.push(communityDistrict);
 			/*Make object with contains of DataSets*/
-			for (var j = 0; j < responseJSON.features[i].geometry.coordinates.length; j++) {
-				for (var g = 0; g < responseJSON.features[i].geometry.coordinates[j].length; g++) {
-					if (responseJSON.features[i].geometry.type == "MultiPolygon") {
+		}
+
+
+
+		for (var i = 0; i < responseJSON.features.length; i++) {
+						if (responseJSON.features[i].geometry.type == "MultiPolygon") {
+							for (var j = 0; j < responseJSON.features[i].geometry.coordinates.length; j++) {
+								for (var g = 0; g < responseJSON.features[i].geometry.coordinates[j].length; g++) {
+									var arra = [];
+									for (var k = 0; k < responseJSON.features[i].geometry.coordinates[j][g].length; k++) {
+										var point = {
+											lat: responseJSON.features[i].geometry.coordinates[j][g][k][1],
+											lng: responseJSON.features[i].geometry.coordinates[j][g][k][0]
+										}
+											arra.push(point);
+									}
+									geoCD[i]._coordLimits.push(arra);
+								}
+							}
+						}else{
+							for (var j = 0; j < responseJSON.features[i].geometry.coordinates.length; j++) {
+								for (var g = 0; g < responseJSON.features[i].geometry.coordinates[j].length; g++) {
+									var point = {
+										lat: responseJSON.features[i].geometry.coordinates[j][g][1],
+										lng: responseJSON.features[i].geometry.coordinates[j][g][0]
+									}
+									geoCD[i]._coordLimits.push(point);
+								}
+							}
+						}
+					}
+/*
+		for (var i = 0; i < responseJSON.features.length; i++) {
+
+			if (responseJSON.features[i].geometry.type == "MultiPolygon") {
+
+
+				for (var j = 0; j < responseJSON.features[i].geometry.coordinates.length; j++) {
+					for (var g = 0; g < responseJSON.features[i].geometry.coordinates[j].length; g++) {
 						for (var k = 0; k < responseJSON.features[i].geometry.coordinates[j][g].length; k++) {
 							var point = {
 								lat: responseJSON.features[i].geometry.coordinates[j][g][k][0],
@@ -126,11 +162,7 @@ function getDataShapeDistric( url ){
 						geoCD[i]._coordLimits.push(point);
 					}
 				}
-			}
-		}
-
-
-
+			}*/
 
 
 			console.log(geoCD);
@@ -138,7 +170,7 @@ function getDataShapeDistric( url ){
 
 
 
-			
+
 
 })
 .fail(function (error) {
@@ -158,7 +190,9 @@ function getRandomColor() {
 
 function drawNB(){
 	for (var i = 0; i < geoCD.length; i++) {
-			console.log(i);
+
+
+
 			var nbBoundaries = new google.maps.Polygon({
 			    paths: geoCD[i].coordLimits,
 			    strokeColor: "red",
@@ -169,6 +203,7 @@ function drawNB(){
 			});
 			nbBoundaries.setMap(map);
 		}
+
 	}
 
 
