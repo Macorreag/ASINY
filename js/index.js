@@ -108,55 +108,51 @@ function getDataShapeDistric( url ){
 			);
 			geoCD.push(communityDistrict);
 			/*Make object with contains of DataSets*/
+			for (var j = 0; j < responseJSON.features[i].geometry.coordinates.length; j++) {
+				for (var g = 0; g < responseJSON.features[i].geometry.coordinates[j].length; g++) {
+					if (responseJSON.features[i].geometry.type == "MultiPolygon") {
+						for (var k = 0; k < responseJSON.features[i].geometry.coordinates[j][g].length; k++) {
+							var point = {
+								lat: responseJSON.features[i].geometry.coordinates[j][g][k][0],
+								lng: responseJSON.features[i].geometry.coordinates[j][g][k][1]
+							}
+							geoCD[i]._coordLimits.push(point);
+						}
+					}else{
+						var point = {
+							lat: responseJSON.features[i].geometry.coordinates[j][g][1],
+							lng: responseJSON.features[i].geometry.coordinates[j][g][0]
+						}
+						geoCD[i]._coordLimits.push(point);
+					}
+				}
+			}
 		}
 
 
 
 
 
-		for (var i = 0; i < responseJSON.features.length; i++) {
-
-			if (responseJSON.features[i].geometry.type == "MultiPolygon") {
-
-
-				for (var j = 0; j < responseJSON.features[i].geometry.coordinates.length; j++) {
-					for (var g = 0; g < responseJSON.features[i].geometry.coordinates[j].length; g++) {
-						for (var k = 0; k < responseJSON.features[i].geometry.coordinates[j][g].length; k++) {
-
-							var point = {
-								lat: responseJSON.features[i].geometry.coordinates[j][g][k][1],
-								lng: responseJSON.features[i].geometry.coordinates[j][g][k][0]
-							}
-								geoCD[i]._coordLimits.push(point);
-								//console.log(point);
-							}
-						}
-					}
-				}else{
-
-					for (var j = 0; j < responseJSON.features[i].geometry.coordinates.length; j++) {
-
-						for (var g = 0; g < responseJSON.features[i].geometry.coordinates[j].length; g++) {
-							var point = {
-								lat: responseJSON.features[i].geometry.coordinates[j][g][1],
-								lng: responseJSON.features[i].geometry.coordinates[j][g][0]
-							}
-							geoCD[i]._coordLimits.push(point);
-						}
-					}
-				}
-			}
-
-
 			console.log(geoCD);
 			drawNB();
 
+
+
+			
 
 })
 .fail(function (error) {
 	/**/
 	console.error(error);
 })
+}
+function getRandomColor() {
+  var letters = '0123456789ABCDEF';
+  var color = '#';
+  for (var i = 0; i < 6; i++) {
+    color += letters[Math.floor(Math.random() * 16)];
+  }
+  return color;
 }
 
 
@@ -242,7 +238,7 @@ console.log(infoRows);
 
 $("document").ready(function(){
 	var data =  getDataShapeDistric(SHAPECD);
-
+	drawNB();
 
 });
 
