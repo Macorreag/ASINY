@@ -149,7 +149,7 @@ function getDataShapeDistric( url ){
 
 
 			console.log(geoCD);
-
+			drawNB();
 
 
 })
@@ -159,6 +159,21 @@ function getDataShapeDistric( url ){
 })
 }
 
+
+function drawNB(){
+	for (var i = 0; i < geoCD.length; i++) {
+			console.log(i);
+			var nbBoundaries = new google.maps.Polygon({
+			    paths: geoCD[i].coordLimits,
+			    strokeColor: "red",
+			    strokeOpacity: 0.8,
+			    strokeWeight: 2,
+			    fillColor: "blue",
+			    fillOpacity: 0.2
+			});
+			nbBoundaries.setMap(map);
+		}
+	}
 
 
 
