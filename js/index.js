@@ -2,16 +2,55 @@
 const NAMESNEIGHBORHOOD ="https://data.cityofnewyork.us/api/views/xyye-rtrs/rows.json?accessType=DOWNLOAD";
 const SHAPECD = "https://services5.arcgis.com/GfwWNkhOj9bNBqoJ/arcgis/rest/services/nycd/FeatureServer/0/query?where=1=1&outFields=*&outSR=4326&f=geojson"
 const BOROUGHTS_NAMES = ["Manhattan", "The Bronx", "Brooklyn", "Queens", "Staten Island"];
-const coordUniversity={lat:40.7291, lng:-73.9965 }; /*Position University*/
+const coordUniversity = {	/*Position University*/
+	lat:40.7291, lng:-73.9965
+};
 
 /*CD is a  COMMUNITY DISTRICT /
-const coordUniversity={lat:40.7291, lng:-73.9965 }; /*Position University*/
+
 /*JSON filtered */
 var infoRows = [];
 var nbInfo = [];
 /*Variables for GMaps*/
 var map;
 var markers = [];
+
+/*ranking variables*/
+var topTen = [];
+var globale = [];
+
+var rata = [
+	{
+		"id": "bootstrap-table",
+		"district": "526",
+		"forks_count": "122",
+		"description": "ap v2 and v3) "
+	},
+	{
+		"id": "multiple-select",
+		"district": "288",
+		"forks_count": "150",
+		"description": "heckboxes :)"
+	},
+	{
+		"id": "bootstrap-show-password",
+		"district": "32",
+		"forks_count": "11",
+		"description": "bootstrap."
+	},
+	{
+		"id": "blog",
+		"district": "13",
+		"forks_count": "4",
+		"description": "my blog"
+	},
+	{
+		"id": "scutech-redmine",
+		"district": "6",
+		"forks_count": "3",
+		"description": "Redmine notification tools for chrome extension."
+	}
+];
 
 
 
@@ -85,14 +124,7 @@ class CommunityDistrict {
 
 }
 
-function castToCoordinate( coordinates ){
-	for (var i = 0; i < coordinates.length ; i++){
-		var point = {
-			lat: coordinates[1],
-			lng: coordinates[0]
-		}
-	}
-}
+
 
 function getDataShapeDistric( url ){
 	var data = $.get(url, () => {
@@ -104,56 +136,24 @@ function getDataShapeDistric( url ){
 				responseJSON.features[i].properties.BoroCD,
 				"",
 				[],
+				"",
 				"true", /*Tem*/
 			);
 			geoCD.push(communityDistrict);
-			/*Make object with contains of DataSets*/
-		}
 
+			for (var j = 0; j < responseJSON.features[i].geometry.coordinates.length; j++) {
+				for (var g = 0; g < responseJSON.features[i].geometry.coordinates[j].length; g++) {
 
-
-		for (var i = 0; i < responseJSON.features.length; i++) {
-						if (responseJSON.features[i].geometry.type == "MultiPolygon") {
-							for (var j = 0; j < responseJSON.features[i].geometry.coordinates.length; j++) {
-								for (var g = 0; g < responseJSON.features[i].geometry.coordinates[j].length; g++) {
-									var arra = [];
-									for (var k = 0; k < responseJSON.features[i].geometry.coordinates[j][g].length; k++) {
-										var point = {
-											lat: responseJSON.features[i].geometry.coordinates[j][g][k][1],
-											lng: responseJSON.features[i].geometry.coordinates[j][g][k][0]
-										}
-											arra.push(point);
-									}
-									geoCD[i]._coordLimits.push(arra);
-								}
-							}
-						}else{
-							for (var j = 0; j < responseJSON.features[i].geometry.coordinates.length; j++) {
-								for (var g = 0; g < responseJSON.features[i].geometry.coordinates[j].length; g++) {
-									var point = {
-										lat: responseJSON.features[i].geometry.coordinates[j][g][1],
-										lng: responseJSON.features[i].geometry.coordinates[j][g][0]
-									}
-									geoCD[i]._coordLimits.push(point);
-								}
-							}
-						}
-					}
-/*
-		for (var i = 0; i < responseJSON.features.length; i++) {
-
-			if (responseJSON.features[i].geometry.type == "MultiPolygon") {
-
-
-				for (var j = 0; j < responseJSON.features[i].geometry.coordinates.length; j++) {
-					for (var g = 0; g < responseJSON.features[i].geometry.coordinates[j].length; g++) {
+					if (responseJSON.features[i].geometry.type == "MultiPolygon") {
+						var subCoor = [];
 						for (var k = 0; k < responseJSON.features[i].geometry.coordinates[j][g].length; k++) {
 							var point = {
-								lat: responseJSON.features[i].geometry.coordinates[j][g][k][0],
-								lng: responseJSON.features[i].geometry.coordinates[j][g][k][1]
+								lat: responseJSON.features[i].geometry.coordinates[j][g][k][1],
+								lng: responseJSON.features[i].geometry.coordinates[j][g][k][0]
 							}
-							geoCD[i]._coordLimits.push(point);
+							subCoor.push(point);
 						}
+						geoCD[i]._coordLimits.push(subCoor);
 					}else{
 						var point = {
 							lat: responseJSON.features[i].geometry.coordinates[j][g][1],
@@ -162,49 +162,66 @@ function getDataShapeDistric( url ){
 						geoCD[i]._coordLimits.push(point);
 					}
 				}
-			}*/
+			}
 
 
-			console.log(geoCD);
-			drawNB();
-
-
-
-
-
-})
-.fail(function (error) {
-	/**/
-	console.error(error);
-})
-}
-function getRandomColor() {
-  var letters = '0123456789ABCDEF';
-  var color = '#';
-  for (var i = 0; i < 6; i++) {
-    color += letters[Math.floor(Math.random() * 16)];
-  }
-  return color;
-}
-
-
-function drawNB(){
-	for (var i = 0; i < geoCD.length; i++) {
-
-
-
-			var nbBoundaries = new google.maps.Polygon({
-			    paths: geoCD[i].coordLimits,
-			    strokeColor: "red",
-			    strokeOpacity: 0.8,
-			    strokeWeight: 2,
-			    fillColor: "blue",
-			    fillOpacity: 0.2
-			});
-			nbBoundaries.setMap(map);
+			/*Make object with contains of DataSets*/
 		}
 
-	}
+
+
+
+		console.log(geoCD);
+
+		for(var iter = 0 ;iter < 10; iter++){
+			topTen.push(
+				{
+					"id":geoCD[iter].id,
+					"district":geoCD[iter].district
+				}
+
+			);
+
+		}
+		//for(var i = 0; i< 71 ;i++){
+		globale = JSON.stringify(topTen);
+		console.log(topTen);
+		console.log(rata);
+		drawNB(1);
+		//}
+
+
+
+
+
+	})
+	.fail(function (error) {
+		/**/
+		console.error(error);
+	})
+}
+
+
+
+
+function drawNB(i){
+	//for (var i = 0; i < geoCD.length; i++) {
+
+
+
+	var nbBoundaries = new google.maps.Polygon({
+		paths: geoCD[i].coordLimits,
+		strokeColor: "red",
+		strokeOpacity: 0.8,
+		strokeWeight: 2,
+		fillColor: "blue",
+		fillOpacity: 0.2
+	});
+	nbBoundaries.setMap(map);
+	console.log(geoCD[i]._id,geoCD[i].district);
+	//}
+
+}
 
 
 
@@ -272,47 +289,66 @@ console.log(infoRows);
 
 
 $("document").ready(function(){
+
 	var data =  getDataShapeDistric(SHAPECD);
-	drawNB();
+	getDataNeighborhood(NAMESNEIGHBORHOOD);
+
+	$('#table').bootstrapTable({
+		data:rata,
+		onClickRow: function (row){
+			console.log(row);
+		}
+
+		//checkbox: true,
+	});
+
+fillData();
 
 });
 
+operateEvents = {
+	'click .like': function (e, value, row, index) {
+		alert(row);
+
+	}};
+
+	function fillData(){
+		rata.push( {id :geoCD[0].id,district: geoCD[0].district});
+		$('#table').bootstrapTable('updateRow',6);
+	}
+
+	/*Matriz que contiene los marcaadores para posicionar en el mapa*/
+	function initMap() {
+		// Constructor creates a new map - only center and zoom are required.
+		map = new google.maps.Map(document.getElementById('map'), {
+			/*Aqui vive el mapa,se maneja dentro de la clase google.maps*/
+			center: coordUniversity,
+			zoom: 11
+			/*29 niveles de zoom para iniciar la vista*/
+		});
 
 
+		var image = {
+			url: 'https://i.imgur.com/QDsm8jB.png',
+			size: new google.maps.Size(45, 45),
+			origin: new google.maps.Point(0, 0),
+			anchor: new google.maps.Point(25,45 )
+		};
+		setMarker(image,coordUniversity,'NYC University');
+
+	}
 
 
-/*Matriz que contiene los marcaadores para posicionar en el mapa*/
-function initMap() {
-	// Constructor creates a new map - only center and zoom are required.
-	map = new google.maps.Map(document.getElementById('map'), {
-		/*Aqui vive el mapa,se maneja dentro de la clase google.maps*/
-		center: coordUniversity,
-		zoom: 11
-		/*29 niveles de zoom para iniciar la vista*/
-	});
+	/*Functions for Google Maps*/
 
-
-	var image = {
-		url: 'https://i.imgur.com/QDsm8jB.png',
-		size: new google.maps.Size(45, 45),
-		origin: new google.maps.Point(0, 0),
-		anchor: new google.maps.Point(25,45 )
-	};
-	setMarker(image,coordUniversity,'NYC University');
-
-}
-
-
-/*Functions for Google Maps*/
-
-function setMarker(image,coordinates,textHover) {
-	var marker = new google.maps.Marker({
-		position:coordinates,
-		map: map,
-		/*Mapa donde se colocara el marker*/
-		icon: image,
-		title: textHover,
-		/*Text show in event Hover*/
-		zIndex: 100
-	});
-}
+	function setMarker(image,coordinates,textHover) {
+		var marker = new google.maps.Marker({
+			position:coordinates,
+			map: map,
+			/*Mapa donde se colocara el marker*/
+			icon: image,
+			title: textHover,
+			/*Text show in event Hover*/
+			zIndex: 100
+		});
+	}
