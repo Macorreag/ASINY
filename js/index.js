@@ -16,7 +16,7 @@ const DISTRICT_NAMES = ["Manhattan", "Bronx", "Brooklyn", "Queens", "Staten Isla
 
 /*(Joint of Interest Areas) Not living posible Areas*/
 const JIA = [164,226,227,228,355,356,480,481,482,483,484,595];
-
+var colorJIA = "rgba(0, 0, 0, 0.9)";
 
 
 const coordUniversity = {	/*Position University*/
@@ -32,6 +32,16 @@ NEIGHBORHOOD[]
 ]
 */
 
+/*Manage */
+function getRandomInt(min, max) {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+function randomColorRGBA( a ){
+	var r = getRandomInt(0, 255);
+	var g = getRandomInt(0, 255);
+	var b = getRandomInt(0, 255);
+	return ("rgba(" +r+ "," +g+ "," +b+ "," +a+ ")");
+}
 /*Data Treatment
 */
 function nameDistrict( numberCD ){
@@ -147,7 +157,11 @@ class CommunityDistrict {
 		this._id = Number(num);
 		this._coorCenter = coorCenter;/*Acomodar para si recibe POINT lo organize*/
 		this._coordLimits = coordLimits;
-		this._color = "blue"; /*Dejar ramdom dentro del costructor para luego usar*/
+		if(JIA.includes(this._id)){
+			this._color = colorJIA;
+		}else{
+			this._color = randomColorRGBA(0.8); /*Dejar ramdom dentro del costructor para luego usar*/
+		}
 	}
 	get id() {
 		return this._id;
@@ -219,14 +233,12 @@ function getDataShapeDistric( url ){
 
 
 
-function drawNB(coordLimits){
+function drawNB( shape ){
 	var nbBoundaries = new google.maps.Polygon({
-		paths: coordLimits,
-		strokeColor: "red",
-		strokeOpacity: 0.8,
+		paths: shape.coordLimits,
+		strokeColor: shape.color,
 		strokeWeight: 2,
-		fillColor: "blue",
-		fillOpacity: 0.2
+		fillColor: shape.color
 	});
 	nbBoundaries.setMap(map);
 }
@@ -298,7 +310,7 @@ console.log(infoRows);
 
 $("document").ready(function(){
 	 shapes = getDataShapeDistric(SHAPECD);
-	var data =  getDataShapeDistric(SHAPECD);
+	//var data =  getDataShapeDistric(SHAPECD);
 	getDataNeighborhood(NAMESNEIGHBORHOOD);
 
 	$('#table').bootstrapTable({
@@ -306,7 +318,7 @@ $("document").ready(function(){
 		onClickRow: function (row,$element){
 			console.log(row);
 			$element.css({backgroundColor: row.color});
-			drawNB(shapes[0].coordLimits);
+			drawNB(shapes[row.positionArray]);
 		},
 
 		clickToSelect:true,
@@ -341,7 +353,14 @@ $("document").ready(function(){
 function drawHabi(){
 	for (var i = 0 ;i  < shapes.length;i++){
 			if(shapes[i].habitable){
-					drawNB(i);
+					drawNB(shapes[i]);
+			}else{
+				//console.log(shapes[i].id);
 			}
 	}
+	var bounds = new google.maps.LatLngBounds();
+	for (var i = 0; i < shapes[0].coordLimits.length; i++) {
+	  bounds.extend(shapes[1].coordLimits[i]);
+	}
+	console.log(bounds.getCenter());
 }
