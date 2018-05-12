@@ -1,16 +1,96 @@
 /*DataSets URl*/
 const NAMESNEIGHBORHOOD ="https://data.cityofnewyork.us/api/views/xyye-rtrs/rows.json?accessType=DOWNLOAD";
+
+/*
+CD is a  COMMUNITY DISTRICT
+[9] Point of Neighborhood
+[10] Complete Name Neighborhood
+[11] CD to which belongs(Orden inverted 12 is de 1 CD)
+*/
 const SHAPECD = "https://services5.arcgis.com/GfwWNkhOj9bNBqoJ/arcgis/rest/services/nycd/FeatureServer/0/query?where=1=1&outFields=*&outSR=4326&f=geojson"
-const BOROUGHTS_NAMES = ["Manhattan", "The Bronx", "Brooklyn", "Queens", "Staten Island"];
+/*
+features[i].properties.BoroCD  = 100 * DISTRICT_NAMES + CD
+features[i].geometry.coordinates[j] = Coordinates of Shape
+*/
+const DISTRICT_NAMES = ["Manhattan", "Bronx", "Brooklyn", "Queens", "Staten Island"];
+
+/*(Joint of Interest Areas) Not living posible Areas*/
+const JIA = [164,226,227,228,355,356,480,481,482,483,484,595];
+
+
+
 const coordUniversity = {	/*Position University*/
 	lat:40.7291, lng:-73.9965
 };
 
-/*CD is a  COMMUNITY DISTRICT /
+/*
+Objects
+DISTRICT[
+CommunityDistrict{
+NEIGHBORHOOD[]
+}
+]
+*/
+
+/*Data Treatment
+*/
+function nameDistrict( numberCD ){
+	/*Number of CD define your DISTRICT */
+	var n = (Number(numberCD) /100)-1;
+	return	DISTRICT_NAMES[parseInt(n)];
+}
+
+function coordinateGmaps( chain ){
+	/*Cast Strng POINT to GmapsFormat*/
+	var temp = chain.split(" ");
+	temp[1] = temp[1].substring(1,(temp[1].length));
+	temp[2] = temp[2].substring(0,(temp[2].length-1));
+	var point = {
+		lat:Number(temp[1]), lng:Number(temp[2])
+	}
+	return point;
+}
+
+
+
+/*Functions for Google Maps*/
+
+function setMarker(image,coordinates,textHover) {
+		var marker = new google.maps.Marker({
+			position:coordinates,
+			map: map,
+			/*Mapa donde se colocara el marker*/
+			icon: image,
+			title: textHover,
+			/*Text show in event Hover*/
+			zIndex: 100
+		});
+}
+
+function initMap() {
+		map = new google.maps.Map(document.getElementById('map'), {
+			center: coordUniversity,
+			zoom: 11
+			/*29 levels to Zoom*/
+		});
+
+		var image = {
+			url: 'https://i.imgur.com/QDsm8jB.png',
+			size: new google.maps.Size(45, 45),
+			origin: new google.maps.Point(0, 0),
+			anchor: new google.maps.Point(25,45)
+		};
+
+		setMarker(image,coordUniversity,'NYC University');
+}
+
+/*/Clean Code/Clean Code/Clean Code/Clean Code/Clean Code/Clean Code/Clean Code/Clean Code*/
+
 
 /*JSON filtered */
 var infoRows = [];
 var nbInfo = [];
+ var shapes=[];
 /*Variables for GMaps*/
 var map;
 var markers = [];
@@ -21,52 +101,20 @@ var globale = [];
 
 var rata = [
 	{
-		"id": "bootstrap-table",
-		"district": "526",
-		"forks_count": "122",
-		"description": "ap v2 and v3) "
-	},
-	{
-		"id": "multiple-select",
-		"district": "288",
-		"forks_count": "150",
-		"description": "heckboxes :)"
-	},
-	{
-		"id": "bootstrap-show-password",
-		"district": "32",
-		"forks_count": "11",
-		"description": "bootstrap."
-	},
-	{
-		"id": "blog",
-		"district": "13",
-		"forks_count": "4",
-		"description": "my blog"
-	},
-	{
-		"id": "scutech-redmine",
-		"district": "6",
-		"forks_count": "3",
-		"description": "Redmine notification tools for chrome extension."
+		"positionArray":"0",
+		"id": "",
+		"district": "",
+		"color": "",
+		"description": ""
 	}
 ];
 
 
-
-var geoCD = [];
-
-function nameDistrict( numberCD ){
-	/*Number of CD define your DISTRICT */
-	var n = (Number(numberCD) /100)-1;
-	return	BOROUGHTS_NAMES[parseInt(n)];
-}
-
 class Neighborhood {
-	/*Neighborhood in the 5 district */
+	/*In the communityDistrict*/
 	constructor(name,coorCenter,district,coordLimits,habitable) {
 		this._name = name;
-		this._coorCenter = coorCenter;/*Acomodar para si recibe POINT lo organize*/
+		this._coorCenter = coordinateGmaps(coorCenter);
 		this._district = district;
 		this._coordLimits = coordLimits;
 		this._habitable = habitable;
@@ -95,12 +143,11 @@ class Neighborhood {
 }
 class CommunityDistrict {
 	/*CommunityDistrict in the 5 district */
-	constructor(num,coorCenter,coordLimits,habitable) {
+	constructor(num,coorCenter,coordLimits) {
 		this._id = Number(num);
 		this._coorCenter = coorCenter;/*Acomodar para si recibe POINT lo organize*/
 		this._coordLimits = coordLimits;
-		this._habitable = habitable;
-		this._color = "#111111"; /*Dejar ramdom dentro del costructor para luego usar*/
+		this._color = "blue"; /*Dejar ramdom dentro del costructor para luego usar*/
 	}
 	get id() {
 		return this._id;
@@ -115,18 +162,19 @@ class CommunityDistrict {
 	get coordLimits(){
 		return this._coordLimits;
 	}
-
 	get habitable(){
-		return this._habitable;
+		return !JIA.includes(this._id);/*Validate if is habitable*/;
 	}
-
-
-
+	get color(){
+		return this._color;
+	}
 }
 
 
 
 function getDataShapeDistric( url ){
+	/*Organize DataSets of Shapes */
+	var geoCD = [];
 	var data = $.get(url, () => {
 	})
 	.done(function () {
@@ -136,11 +184,9 @@ function getDataShapeDistric( url ){
 				responseJSON.features[i].properties.BoroCD,
 				"",
 				[],
-				"",
-				"true", /*Tem*/
+				""
 			);
 			geoCD.push(communityDistrict);
-
 			for (var j = 0; j < responseJSON.features[i].geometry.coordinates.length; j++) {
 				for (var g = 0; g < responseJSON.features[i].geometry.coordinates[j].length; g++) {
 
@@ -162,55 +208,20 @@ function getDataShapeDistric( url ){
 						geoCD[i]._coordLimits.push(point);
 					}
 				}
-			}
-
-
-			/*Make object with contains of DataSets*/
+			}			/*Make object with contains of DataSets*/
 		}
-
-
-
-
-		console.log(geoCD);
-
-		for(var iter = 0 ;iter < 10; iter++){
-			topTen.push(
-				{
-					"id":geoCD[iter].id,
-					"district":geoCD[iter].district
-				}
-
-			);
-
-		}
-		//for(var i = 0; i< 71 ;i++){
-		globale = JSON.stringify(topTen);
-		console.log(topTen);
-		console.log(rata);
-		drawNB(1);
-		//}
-
-
-
-
-
-	})
-	.fail(function (error) {
-		/**/
+	}).fail(function (error) {
 		console.error(error);
 	})
+	return geoCD;
 }
 
 
 
 
-function drawNB(i){
-	//for (var i = 0; i < geoCD.length; i++) {
-
-
-
+function drawNB(coordLimits){
 	var nbBoundaries = new google.maps.Polygon({
-		paths: geoCD[i].coordLimits,
+		paths: coordLimits,
 		strokeColor: "red",
 		strokeOpacity: 0.8,
 		strokeWeight: 2,
@@ -218,9 +229,6 @@ function drawNB(i){
 		fillOpacity: 0.2
 	});
 	nbBoundaries.setMap(map);
-	console.log(geoCD[i]._id,geoCD[i].district);
-	//}
-
 }
 
 
@@ -289,66 +297,51 @@ console.log(infoRows);
 
 
 $("document").ready(function(){
-
+	 shapes = getDataShapeDistric(SHAPECD);
 	var data =  getDataShapeDistric(SHAPECD);
 	getDataNeighborhood(NAMESNEIGHBORHOOD);
 
 	$('#table').bootstrapTable({
 		data:rata,
-		onClickRow: function (row){
+		onClickRow: function (row,$element){
 			console.log(row);
+			$element.css({backgroundColor: row.color});
+			drawNB(shapes[0].coordLimits);
+		},
+
+		clickToSelect:true,
+		rememberOrder:true,
+		onCheck: function(row,$element){
+
+			alert("hi");
 		}
 
 		//checkbox: true,
 	});
-
-fillData();
+	//drawNB(shapes[3].coordLimits);
+	fillData();
 
 });
 
-operateEvents = {
-	'click .like': function (e, value, row, index) {
-		alert(row);
-
-	}};
 
 	function fillData(){
-		rata.push( {id :geoCD[0].id,district: geoCD[0].district});
+
+				for(var iter = 0 ;iter < 10; iter++){
+					rata.push(
+						{
+							"positionArray":iter,
+							"id":shapes[iter].id,
+							"district":shapes[iter].district,
+							"color":shapes[iter].color
+						}
+					);
+				}
 		$('#table').bootstrapTable('updateRow',6);
 	}
-
-	/*Matriz que contiene los marcaadores para posicionar en el mapa*/
-	function initMap() {
-		// Constructor creates a new map - only center and zoom are required.
-		map = new google.maps.Map(document.getElementById('map'), {
-			/*Aqui vive el mapa,se maneja dentro de la clase google.maps*/
-			center: coordUniversity,
-			zoom: 11
-			/*29 niveles de zoom para iniciar la vista*/
-		});
-
-
-		var image = {
-			url: 'https://i.imgur.com/QDsm8jB.png',
-			size: new google.maps.Size(45, 45),
-			origin: new google.maps.Point(0, 0),
-			anchor: new google.maps.Point(25,45 )
-		};
-		setMarker(image,coordUniversity,'NYC University');
-
+function drawHabi(){
+	for (var i = 0 ;i  < shapes.length;i++){
+			if(shapes[i].habitable){
+					drawNB(i);
+			}
 	}
-
-
-	/*Functions for Google Maps*/
-
-	function setMarker(image,coordinates,textHover) {
-		var marker = new google.maps.Marker({
-			position:coordinates,
-			map: map,
-			/*Mapa donde se colocara el marker*/
-			icon: image,
-			title: textHover,
-			/*Text show in event Hover*/
-			zIndex: 100
-		});
-	}
+}
