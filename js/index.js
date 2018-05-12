@@ -9,10 +9,10 @@ CD is a  COMMUNITY DISTRICT
 */
 const SHAPECD = "https://services5.arcgis.com/GfwWNkhOj9bNBqoJ/arcgis/rest/services/nycd/FeatureServer/0/query?where=1=1&outFields=*&outSR=4326&f=geojson"
 /*
-features[i].properties.BoroCD  = 100 * DISTRICT_NAMES + CD
+features[i].properties.BoroCD  = 100 * BOROUGH + CD
 features[i].geometry.coordinates[j] = Coordinates of Shape
 */
-const DISTRICT_NAMES = ["Manhattan", "Bronx", "Brooklyn", "Queens", "Staten Island"];
+const BOROUGH = ["Manhattan", "Bronx", "Brooklyn", "Queens", "Staten Island"];
 
 /*(Joint of Interest Areas) Not living posible Areas*/
 const JIA = [164,226,227,228,355,356,480,481,482,483,484,595];
@@ -25,7 +25,7 @@ const coordUniversity = {	/*Position University*/
 
 /*
 Objects
-DISTRICT[
+BOROUGH[
 CommunityDistrict{
 NEIGHBORHOOD[]
 }
@@ -44,10 +44,10 @@ function randomColorRGBA( a ){
 }
 /*Data Treatment
 */
-function nameDistrict( numberCD ){
-	/*Number of CD define your DISTRICT */
+function numberBorough( numberCD ){
+	/*Number of CD define your BOROUGH */
 	var n = (Number(numberCD) /100)-1;
-	return	DISTRICT_NAMES[parseInt(n)];
+	return	parseInt(n);
 }
 
 function coordinateGmaps( chain ){
@@ -160,7 +160,7 @@ class CommunityDistrict {
 		if(JIA.includes(this._id)){
 			this._color = colorJIA;
 		}else{
-			this._color = randomColorRGBA(0.8); /*Dejar ramdom dentro del costructor para luego usar*/
+			this._color = randomColorRGBA(0.6); /*Dejar ramdom dentro del costructor para luego usar*/
 		}
 	}
 	get id() {
@@ -170,8 +170,8 @@ class CommunityDistrict {
 	get coorCenter(){
 		return this._coorCenter;
 	}
-	get district(){
-		return nameDistrict(this._id);
+	get borough(){
+		return BOROUGH[numberBorough(this._id)];
 	}
 	get coordLimits(){
 		return this._coordLimits;
@@ -227,7 +227,9 @@ function getDataShapeDistric( url ){
 	}).fail(function (error) {
 		console.error(error);
 	})
+
 	return geoCD;
+
 }
 
 
@@ -261,10 +263,7 @@ function getDataNeighborhood(URL){
 			infoRows.push(neighborhood);
 			/*Make object with contains of DataSets*/
 		}
-		console.log(infoRows);
-		console.log(infoRows.sort(function(name){
-
-		}));/*
+	/*
 		var tableReference = $("#city")[0];
 		var newRow, state, deaths, year;
 		for(var i = 0;i <infoRows.length;i++){
@@ -338,29 +337,27 @@ $("document").ready(function(){
 
 	function fillData(){
 
-				for(var iter = 0 ;iter < 10; iter++){
+				for(var iter = 1 ;iter < 10; iter++){
 					rata.push(
 						{
 							"positionArray":iter,
 							"id":shapes[iter].id,
-							"district":shapes[iter].district,
+							"district":shapes[iter].borough,
 							"color":shapes[iter].color
 						}
 					);
 				}
 		$('#table').bootstrapTable('updateRow',6);
 	}
-function drawHabi(){
-	for (var i = 0 ;i  < shapes.length;i++){
-			if(shapes[i].habitable){
-					drawNB(shapes[i]);
-			}else{
-				//console.log(shapes[i].id);
-			}
+	function compareById(a,b) {
+	  if (a.id < b.id)
+	    return -1;
+	  if (a.id > b.id)
+	    return 1;
+	  return 0;
 	}
-	var bounds = new google.maps.LatLngBounds();
-	for (var i = 0; i < shapes[0].coordLimits.length; i++) {
-	  bounds.extend(shapes[1].coordLimits[i]);
-	}
-	console.log(bounds.getCenter());
+//shapes.sort(compare)
+function separateByBoroughts( array ){
+		var  result = array.filter(dis => numberBorough(dis.id) == 0);
+		return result;
 }
