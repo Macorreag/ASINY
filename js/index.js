@@ -1,4 +1,4 @@
-/*DataSets URl*/
+neighborhoods/*DataSets URl*/
 const NAMESNEIGHBORHOOD ="https://data.cityofnewyork.us/api/views/xyye-rtrs/rows.json?accessType=DOWNLOAD";
 
 /*
@@ -34,7 +34,7 @@ NEIGHBORHOOD[]
 
 /*Manage */
 function getRandomInt(min, max) {
-  return Math.floor(Math.random() * (max - min + 1)) + min;
+	return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 function randomColorRGBA( a ){
 	var r = getRandomInt(0, 255);
@@ -66,41 +66,43 @@ function coordinateGmaps( chain ){
 /*Functions for Google Maps*/
 
 function setMarker(image,coordinates,textHover) {
-		var marker = new google.maps.Marker({
-			position:coordinates,
-			map: map,
-			/*Mapa donde se colocara el marker*/
-			icon: image,
-			title: textHover,
-			/*Text show in event Hover*/
-			zIndex: 100
-		});
+	var marker = new google.maps.Marker({
+		position:coordinates,
+		map: map,
+		/*Mapa donde se colocara el marker*/
+		icon: image,
+		title: textHover,
+		/*Text show in event Hover*/
+		zIndex: 100
+	});
 }
 
 function initMap() {
-		map = new google.maps.Map(document.getElementById('map'), {
-			center: coordUniversity,
-			zoom: 11
-			/*29 levels to Zoom*/
-		});
+	map = new google.maps.Map(document.getElementById('map'), {
+		center: coordUniversity,
+		zoom: 11
+		/*29 levels to Zoom*/
+	});
 
-		var image = {
-			url: 'https://i.imgur.com/QDsm8jB.png',
-			size: new google.maps.Size(45, 45),
-			origin: new google.maps.Point(0, 0),
-			anchor: new google.maps.Point(25,45)
-		};
+	var image = {
+		url: 'https://i.imgur.com/QDsm8jB.png',
+		size: new google.maps.Size(45, 45),
+		origin: new google.maps.Point(0, 0),
+		anchor: new google.maps.Point(25,45)
+	};
 
-		setMarker(image,coordUniversity,'NYC University');
+	setMarker(image,coordUniversity,'NYC University');
 }
 
 /*/Clean Code/Clean Code/Clean Code/Clean Code/Clean Code/Clean Code/Clean Code/Clean Code*/
 
 
 /*JSON filtered */
-var infoRows = [];
+var neighborhoods = [];
 var nbInfo = [];
- var shapes=[];
+var shapes=[];
+var boroughts = [];
+
 /*Variables for GMaps*/
 var map;
 var markers = [];
@@ -109,7 +111,7 @@ var markers = [];
 var topTen = [];
 var globale = [];
 
-var rata = [
+var topTen = [
 	{
 		"positionArray":"0",
 		"id": "",
@@ -122,12 +124,17 @@ var rata = [
 
 class Neighborhood {
 	/*In the communityDistrict*/
-	constructor(name,coorCenter,district,coordLimits,habitable) {
+	constructor(name,coorCenter,district,coordLimits) {
 		this._name = name;
 		this._coorCenter = coordinateGmaps(coorCenter);
 		this._district = district;
 		this._coordLimits = coordLimits;
-		this._habitable = habitable;
+		this.distanceWalk  ,
+		this.distanceCar  ,
+		this.distanceTransport  ,
+		this.timwWalk  ,
+		this.timeCar  ,
+		this.timeTrans  ,
 		this._color = "#111111"; /*Dejar ramdom dentro del costructor para luego usar*/
 	}
 	get name() {
@@ -146,27 +153,29 @@ class Neighborhood {
 		return this._coordLimits;
 	}
 
-	get habitable(){
-		return this._habitable;
-	}
 
 }
 class CommunityDistrict {
 	/*CommunityDistrict in the 5 district */
 	constructor(num,coorCenter,coordLimits) {
-		this._id = Number(num);
-		this._coorCenter = coorCenter;/*Acomodar para si recibe POINT lo organize*/
-		this._coordLimits = coordLimits;
+		this._id = Number(num),
+		this._coorCenter = coorCenter,
+		this._coordLimits = coordLimits,
+		this._neighborhoods = [];
+		this._multiPolygon;
 		if(JIA.includes(this._id)){
+			/*JIA is a different color for the user*/
 			this._color = colorJIA;
 		}else{
-			this._color = randomColorRGBA(0.6); /*Dejar ramdom dentro del costructor para luego usar*/
+			this._color = randomColorRGBA(0.6); /*Problema colores muy similares*/
 		}
 	}
 	get id() {
 		return this._id;
 	}
-
+	get multiPolygon(){
+		return this._multiPolygon;
+	}
 	get coorCenter(){
 		return this._coorCenter;
 	}
@@ -177,7 +186,11 @@ class CommunityDistrict {
 		return this._coordLimits;
 	}
 	get habitable(){
-		return !JIA.includes(this._id);/*Validate if is habitable*/;
+		if(!JIA.includes(this._id) && this.neighborhoods.length > 0){
+			return true;/*Validate if is habitable*/;
+		}else{
+			return false;
+		}
 	}
 	get color(){
 		return this._color;
@@ -213,12 +226,14 @@ function getDataShapeDistric( url ){
 							}
 							subCoor.push(point);
 						}
+						geoCD[i]._multiPolygon = true;
 						geoCD[i]._coordLimits.push(subCoor);
 					}else{
 						var point = {
 							lat: responseJSON.features[i].geometry.coordinates[j][g][1],
 							lng: responseJSON.features[i].geometry.coordinates[j][g][0]
 						}
+						geoCD[i]._multiPolygon = false;
 						geoCD[i]._coordLimits.push(point);
 					}
 				}
@@ -245,7 +260,16 @@ function drawNB( shape ){
 	nbBoundaries.setMap(map);
 }
 
+function neighborhoodInCD( neighbor, communityD){
+	if(communityD.multiPolygon){
+		//console.log("a");
+		if(google.maps.geometry.poly.containsLocation(neighbor.coorCenter, communityD.coordLimits)){
+			return true;
+		}
+	}
+	return false;
 
+}
 
 function getDataNeighborhood(URL){
 	/*Como parametro podria tener la URL */
@@ -256,64 +280,50 @@ function getDataNeighborhood(URL){
 			var neighborhood = new Neighborhood(
 				data.responseJSON.data[i][10],
 				data.responseJSON.data[i][9],
-				data.responseJSON.data[i][16],
-				"", /*Tem*/
-				"True" /*Tem*/
+				data.responseJSON.data[i][16],/**/
+				""
 			);
-			infoRows.push(neighborhood);
+			neighborhoods.push(neighborhood);
+			//neighborhoodInCD
+			//boroughts[numberBoro].push(neighborhood);
 			/*Make object with contains of DataSets*/
 		}
-	/*
-		var tableReference = $("#city")[0];
-		var newRow, state, deaths, year;
-		for(var i = 0;i <infoRows.length;i++){
-		newRow = tableReference.insertRow(tableReference.rows.length);
-		state = newRow.insertCell()
-		deaths = newRow.insertCell();
-		year =  newRow.insertCell();
-		state.innerHTML = infoRows[i][0];
-		deaths.innerHTML = infoRows[i][1];
-		year.innerHTML = infoRows[i][2]
-	}
-	/*console.log(data.responseJSON.data.filter(function (n){
-	if(1==1){
 
+	})
+	.fail(function(error){
+		console.log(error);
+	})
 }
-return n[16][0]  ;
-}));
-*/
-/*
-for(var i = 0 ;i < data.responseJSON.data.length ;i++){
-infoRows.push([data.responseJSON.data[i][8],data.responseJSON.data[i][13],data.responseJSON.data[i][9]]);
-/*Primera Fila con el contenido de la row 8 del data set*/
-/*}
-var tableReference = $(".table")[0];
-var newRow, state, deaths, year;
-for(var i = 0;i <infoRows.length;i++){
-newRow = tableReference.insertRow(tableReference.rows.length);
-state = newRow.insertCell()
-deaths = newRow.insertCell();
-year =  newRow.insertCell();
-state.innerHTML = infoRows[i][0];
-deaths.innerHTML = infoRows[i][1];
-year.innerHTML = infoRows[i][2]
+
+function compareById(a,b) {
+	if (a.id < b.id)
+	return -1;
+	if (a.id > b.id)
+	return 1;
+	return 0;
 }
-console.log(infoRows);
-*/
-})
-.fail(function(error){
-	console.log(error);
-})
+
+
+function separateByBoroughts( array ){
+	for (var i = 0 ;i < BOROUGH.length  ; i++){
+		var  filteredCD = array.filter(dis => numberBorough(dis.id) == i);
+		boroughts.push(filteredCD);
+	}
+	return boroughts;
 }
 
 
 $("document").ready(function(){
-	 shapes = getDataShapeDistric(SHAPECD);
-	//var data =  getDataShapeDistric(SHAPECD);
-	getDataNeighborhood(NAMESNEIGHBORHOOD);
+	shapes = getDataShapeDistric(SHAPECD);
+	//separateByBoroughts(shapes);
 
+	//neighborhoods
+	//var data =  getDataShapeDistric(SHAPECD);
+	//getDataNeighborhood(NAMESNEIGHBORHOOD);
+
+	neighborhoods
 	$('#table').bootstrapTable({
-		data:rata,
+		data:topTen,
 		onClickRow: function (row,$element){
 			console.log(row);
 			$element.css({backgroundColor: row.color});
@@ -330,34 +340,36 @@ $("document").ready(function(){
 		//checkbox: true,
 	});
 	//drawNB(shapes[3].coordLimits);
-	fillData();
+	//fillData();
 
 });
 
 
-	function fillData(){
-
-				for(var iter = 1 ;iter < 10; iter++){
-					rata.push(
-						{
-							"positionArray":iter,
-							"id":shapes[iter].id,
-							"district":shapes[iter].borough,
-							"color":shapes[iter].color
-						}
-					);
-				}
-		$('#table').bootstrapTable('updateRow',6);
+function fillData(){
+	console.log(separateByBoroughts(shapes));
+	getDataNeighborhood(NAMESNEIGHBORHOOD);
+	for(var iter = 1 ;iter < 10; iter++){
+		topTen.push(
+			{
+				"positionArray":iter,
+				"id":shapes[iter].id,
+				"district":shapes[iter].borough,
+				"color":shapes[iter].color
+			}
+		);
 	}
-	function compareById(a,b) {
-	  if (a.id < b.id)
-	    return -1;
-	  if (a.id > b.id)
-	    return 1;
-	  return 0;
-	}
-//shapes.sort(compare)
-function separateByBoroughts( array ){
-		var  result = array.filter(dis => numberBorough(dis.id) == 0);
-		return result;
+	$('#table').bootstrapTable('updateRow',6);
 }
+
+function neighborhoodToCD(){
+	for(var i = 0 ;i < neighborhoods.length; i++){
+
+		var numberBoro= BOROUGH.indexOf(neighborhoods[i].district);
+		for(var j = 0; j < boroughts[numberBoro].length ; j++){
+
+			if(neighborhoodInCD( neighborhoods[i], boroughts[numberBoro][j])){
+				boroughts[numberBoro][j].neighborhoods.push("neighborhood");
+			}
+		}
+
+	}}
