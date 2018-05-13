@@ -55,9 +55,13 @@ function coordinateGmaps( chain ){
 	var temp = chain.split(" ");
 	temp[1] = temp[1].substring(1,(temp[1].length));
 	temp[2] = temp[2].substring(0,(temp[2].length-1));
-	var point = {
+	/*var point = {
 		lat:Number(temp[1]), lng:Number(temp[2])
-	}
+	}*/
+	var point = new google.maps.LatLng(
+		Number(temp[2]),
+		Number(temp[1]),
+	 )
 	return point;
 }
 
@@ -179,6 +183,9 @@ class CommunityDistrict {
 	get coorCenter(){
 		return this._coorCenter;
 	}
+	get neighborhoods(){
+		return this._neighborhoods;
+	}
 	get borough(){
 		return BOROUGH[numberBorough(this._id)];
 	}
@@ -220,19 +227,27 @@ function getDataShapeDistric( url ){
 					if (responseJSON.features[i].geometry.type == "MultiPolygon") {
 						var subCoor = [];
 						for (var k = 0; k < responseJSON.features[i].geometry.coordinates[j][g].length; k++) {
-							var point = {
+							/*var point = {
 								lat: responseJSON.features[i].geometry.coordinates[j][g][k][1],
 								lng: responseJSON.features[i].geometry.coordinates[j][g][k][0]
-							}
+							}*/
+							var point = new google.maps.LatLng(
+								 responseJSON.features[i].geometry.coordinates[j][g][k][1],
+								 responseJSON.features[i].geometry.coordinates[j][g][k][0]
+							 )
 							subCoor.push(point);
 						}
 						geoCD[i]._multiPolygon = true;
 						geoCD[i]._coordLimits.push(subCoor);
 					}else{
-						var point = {
+						/*var point = {
 							lat: responseJSON.features[i].geometry.coordinates[j][g][1],
 							lng: responseJSON.features[i].geometry.coordinates[j][g][0]
-						}
+						}*/
+						var point = new google.maps.LatLng(
+							 responseJSON.features[i].geometry.coordinates[j][g][1],
+							 responseJSON.features[i].geometry.coordinates[j][g][0]
+						 )
 						geoCD[i]._multiPolygon = false;
 						geoCD[i]._coordLimits.push(point);
 					}
@@ -261,13 +276,13 @@ function drawNB( shape ){
 }
 
 function neighborhoodInCD( neighbor, communityD){
-	if(communityD.multiPolygon){
-		//console.log("a");
-		if(google.maps.geometry.poly.containsLocation(neighbor.coorCenter, communityD.coordLimits)){
-			return true;
-		}
+	if(!communityD.multiPolygon){
+		console.log("Here");
+		var bermudaTriangle = new google.maps.Polygon({paths: communityD.coordLimits});
+		return google.maps.geometry.poly.containsLocation(neighbor.coorCenter, bermudaTriangle) ?
+		true:
+		false;
 	}
-	return false;
 
 }
 
@@ -368,8 +383,19 @@ function neighborhoodToCD(){
 		for(var j = 0; j < boroughts[numberBoro].length ; j++){
 
 			if(neighborhoodInCD( neighborhoods[i], boroughts[numberBoro][j])){
-				boroughts[numberBoro][j].neighborhoods.push("neighborhood");
+				console.log("Hi2");
+				boroughts[numberBoro][j].neighborhoods.push(neighborhoods[i]);
 			}
 		}
 
 	}}
+function drawNeigh(array){
+	for( var i = 0 ;i <array.length ; i++){
+		var marker = new google.maps.Marker({
+	 		position: array[i].coorCenter,
+	 		map: map,
+	 		title: 'Hello World!'
+		});
+	}
+
+}
