@@ -1,4 +1,4 @@
-neighborhoods/*DataSets URl*/
+/*DataSets URl*/
 const NAMESNEIGHBORHOOD ="https://data.cityofnewyork.us/api/views/xyye-rtrs/rows.json?accessType=DOWNLOAD";
 
 /*
@@ -26,7 +26,7 @@ const coordUniversity = {	/*Position University*/
 /*
 Objects
 BOROUGH[
-CommunityDistrict{
+CommunityDistrict{ IMPORTANT
 NEIGHBORHOOD[]
 }
 ]
@@ -56,16 +56,25 @@ function coordinateGmaps( chain ){
 	temp[1] = temp[1].substring(1,(temp[1].length));
 	temp[2] = temp[2].substring(0,(temp[2].length-1));
 	/*var point = {
-		lat:Number(temp[1]), lng:Number(temp[2])
-	}*/
-	var point = new google.maps.LatLng(
-		Number(temp[2]),
-		Number(temp[1]),
-	 )
-	return point;
+	lat:Number(temp[1]), lng:Number(temp[2])
+}*/
+var point = new google.maps.LatLng(
+	Number(temp[2]),
+	Number(temp[1]),
+)
+return point;
 }
 
-
+function neighborhoodToCD(){
+	for(var i = 0 ;i < neighborhoods.length; i++){
+		var numberBoro= BOROUGH.indexOf(neighborhoods[i].district);
+		for(var j = 0; j < boroughts[numberBoro].length ; j++){
+			if(pointInPath(neighborhoods[i].coorCenter, boroughts[numberBoro][j].coordLimits)){
+				boroughts[numberBoro][j].neighborhoods.push(neighborhoods[i]);
+			}
+		}
+	}
+}
 
 /*Functions for Google Maps*/
 
@@ -96,6 +105,13 @@ function initMap() {
 	};
 
 	setMarker(image,coordUniversity,'NYC University');
+}
+
+function pointInPath( point , coordLimits){
+	var shape = new google.maps.Polygon({paths: coordLimits});
+	return google.maps.geometry.poly.containsLocation(point, shape) ?
+	true:
+	false;
 }
 
 /*/Clean Code/Clean Code/Clean Code/Clean Code/Clean Code/Clean Code/Clean Code/Clean Code*/
@@ -136,7 +152,7 @@ class Neighborhood {
 		this.distanceWalk  ,
 		this.distanceCar  ,
 		this.distanceTransport  ,
-		this.timwWalk  ,
+		this.timeWalk  ,
 		this.timeCar  ,
 		this.timeTrans  ,
 		this._color = "#111111"; /*Dejar ramdom dentro del costructor para luego usar*/
@@ -161,11 +177,11 @@ class Neighborhood {
 }
 class CommunityDistrict {
 	/*CommunityDistrict in the 5 district */
-	constructor(num,coorCenter,coordLimits) {
+	constructor(num,coordLimits) {
 		this._id = Number(num),
-		this._coorCenter = coorCenter,
 		this._coordLimits = coordLimits,
-		this._neighborhoods = [];
+		this._neighborhoods = [],
+		this._distanceCar = null,
 		this._multiPolygon;
 		if(JIA.includes(this._id)){
 			/*JIA is a different color for the user*/
@@ -180,8 +196,12 @@ class CommunityDistrict {
 	get multiPolygon(){
 		return this._multiPolygon;
 	}
-	get coorCenter(){
-		return this._coorCenter;
+	 get  distanceCar(){
+		//if(this.distanceCar == NULL){
+		return distances(this._neighborhoods);
+		//}else{
+			//return this._distanceCar;
+		//}
 	}
 	get neighborhoods(){
 		return this._neighborhoods;
@@ -193,7 +213,7 @@ class CommunityDistrict {
 		return this._coordLimits;
 	}
 	get habitable(){
-		if(!JIA.includes(this._id) && this.neighborhoods.length > 0){
+		if(!JIA.includes(this._id) && this._neighborhoods.length > 0){
 			return true;/*Validate if is habitable*/;
 		}else{
 			return false;
@@ -216,9 +236,7 @@ function getDataShapeDistric( url ){
 		for(var i = 0 ;i < responseJSON.features.length ;i++){
 			var communityDistrict = new CommunityDistrict(
 				responseJSON.features[i].properties.BoroCD,
-				"",
 				[],
-				""
 			);
 			geoCD.push(communityDistrict);
 			for (var j = 0; j < responseJSON.features[i].geometry.coordinates.length; j++) {
@@ -275,16 +293,7 @@ function drawNB( shape ){
 	nbBoundaries.setMap(map);
 }
 
-function neighborhoodInCD( neighbor, communityD){
-	if(!communityD.multiPolygon){
-		console.log("Here");
-		var bermudaTriangle = new google.maps.Polygon({paths: communityD.coordLimits});
-		return google.maps.geometry.poly.containsLocation(neighbor.coorCenter, bermudaTriangle) ?
-		true:
-		false;
-	}
 
-}
 
 function getDataNeighborhood(URL){
 	/*Como parametro podria tener la URL */
@@ -361,8 +370,10 @@ $("document").ready(function(){
 
 
 function fillData(){
-	console.log(separateByBoroughts(shapes));
+separateByBoroughts(shapes);
 	getDataNeighborhood(NAMESNEIGHBORHOOD);
+	neighborhoodToCD();
+		console.log(boroughts);
 	for(var iter = 1 ;iter < 10; iter++){
 		topTen.push(
 			{
@@ -376,19 +387,8 @@ function fillData(){
 	$('#table').bootstrapTable('updateRow',6);
 }
 
-function neighborhoodToCD(){
-	for(var i = 0 ;i < neighborhoods.length; i++){
-
-		var numberBoro= BOROUGH.indexOf(neighborhoods[i].district);
-		for(var j = 0; j < boroughts[numberBoro].length ; j++){
-
-			if(neighborhoodInCD( neighborhoods[i], boroughts[numberBoro][j])){
-				console.log("Hi2");
-				boroughts[numberBoro][j].neighborhoods.push(neighborhoods[i]);
-			}
-		}
-
-	}}
+/*FOR TEST
+*/
 function drawNeigh(array){
 	for( var i = 0 ;i <array.length ; i++){
 		var marker = new google.maps.Marker({
@@ -398,4 +398,58 @@ function drawNeigh(array){
 		});
 	}
 
+}
+function countNeigh(){
+		var num = 0;
+		for (var i=0;i <boroughts.length;i++){
+			for (var j=0;j <boroughts[i].length ;j++){
+				num += boroughts[i][j].neighborhoods.length;
+			}
+		}
+		console.log(num);
+}
+function getJSON( url ){
+	var data = $.get(url,function(){})
+	.done(function(){
+		//return responseJSON = JSON.parse(data.responseText)
+		console.log(data);
+	}).fail(function(error){
+		console.log(error);
+	})
+}
+
+function calculateDistanceCar( origins , destination){
+	var distanceMatrixService = new google.maps.DistanceMatrixService;
+	var devolution = null;
+	var valPro = new Promise(resolve => {
+	setTimeout(() => {
+	distanceMatrixService.getDistanceMatrix({
+		origins: origins,
+		destinations: [destination],
+		unitSystem: google.maps.UnitSystem.METRIC,
+		travelMode: google.maps.DirectionsTravelMode.DRIVING,
+
+	},function(response, status) {
+		if (status !== google.maps.DistanceMatrixStatus.OK) {
+			window.alert('Error was: ' + status);
+		} else {
+
+			//devolution = response;
+				resolve(valPro)
+			//resolve(devolution);
+			//return response;
+		}
+	});
+
+	return devolution;
+	}, 1000);
+  });
+
+}
+//var result = boroughts[0][0].neighborhoods.map(a => a.coorCenter);
+async function distances(neighborhoods){
+	var neighborhoodsDis = neighborhoods.map(a => a.coorCenter);
+//	this._distanceCar = calculateDistanceCar(neighborhoodsDis,coordUniversity);
+	var distances = await calculateDistanceCar(neighborhoodsDis,coordUniversity);
+	return distances;
 }
