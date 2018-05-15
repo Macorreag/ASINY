@@ -12,12 +12,11 @@
   <!--llamado a bootstrap 4 version min -->
 
   <link
-    href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" >
+  href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" >
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.12.1/bootstrap-table.min.css">
-    <script
-  src="https://code.jquery.com/jquery-3.3.1.js"
-  ></script>
-
+  <script  src="https://code.jquery.com/jquery-3.3.1.js" ></script>
+  <script  src="https://d3js.org/d3.v3.min.js"></script>
+  <script  src="https://d3js.org/d3.v5.js"></script>
   <script  src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
   <!-- Latest compiled and minified CSS -->
 
@@ -121,36 +120,44 @@
 
 
       <div class="col-3  panel">
+        <div class="row">
+          <div class="container">
+            <div class="col-sm-6"></div>
+            <div class="test col-sm-6"></div>
+
+          </div>
+        </div>
+
         <p>Mira, se me ocurre que podrías hacerlo de esta manera: dentro de cada una de tus columnas metes una fila (row) y le dices que ocupen todo el espacio (col-md-12) y dentro de la fila donde quieres el espacio le añades un padding con la cantidad de separación que quieres, esto último te sugiero hacerlo mediante un media query en tu hoja de estilos ya que no vas a poder controlarlo mediante alguna clase especial para que se acomode todo correctamente en dispositivos móviles, prueba este código y te va quedar mas claro:</p>
         <button type="button" class="btn" onclick="neighborhoodToCD();">FillTable</button>
         <button type="button" class="btn btn-warning" onclick="sortByDistance();">SortByDistance</button>
         <div class="  margin-top-sm">
-            <table id="table"
-                  data-classes="table table-no-bordered">
-              <thead>
-                <tr>
-                  <th data-field="positionArray">Rank</th>
-                  <th data-field="id">Name</th>
-                  <th data-field="district">Stars</th>
-                </tr>
-              </thead>
+          <table id="table"
+          data-classes="table table-no-bordered">
+          <thead>
+            <tr>
+              <th data-field="positionArray">Rank</th>
+              <th data-field="id">Name</th>
+              <th data-field="district">Stars</th>
+            </tr>
+          </thead>
 
-            </table>
-        </div>
-        <p>Mira, se me ocurre que podrías hacerlo de esta manera: dentro de cada una de tus columnas metes una fila (row) y le dices que ocupen todo el espacio (col-md-12) y dentro de la fila donde quieres el espacio le añades un padding con la cantidad de separación que quieres, esto último te sugiero hacerlo mediante un media query en tu hoja de estilos ya que no vas a poder controlarlo mediante alguna clase especial para que se acomode todo correctamente en dispositivos móviles, prueba este código y te va quedar mas claro:</p>
+        </table>
       </div>
-
+      <p>Mira, se me ocurre que podrías hacerlo de esta manera: dentro de cada una de tus columnas metes una fila (row) y le dices que ocupen todo el espacio (col-md-12) y dentro de la fila donde quieres el espacio le añades un padding con la cantidad de separación que quieres, esto último te sugiero hacerlo mediante un media query en tu hoja de estilos ya que no vas a poder controlarlo mediante alguna clase especial para que se acomode todo correctamente en dispositivos móviles, prueba este código y te va quedar mas claro:</p>
     </div>
+
   </div>
+</div>
 
 
 
 
-  <script type="text/javascript" src="js/index.js"></script>
-  <!--Cargar la API de google maps de forma Asincrona*/-->
-  <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCcVSzMvDoSRvr9RUUIjrLLJ1HjTrUBKcg&v=3&libraries=geometry&callback=initMap">
+<script type="text/javascript" src="js/index.js"></script>
+<!--Cargar la API de google maps de forma Asincrona*/-->
+<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCcVSzMvDoSRvr9RUUIjrLLJ1HjTrUBKcg&v=3&libraries=geometry&callback=initMap">
 </script>
-  <!--Cargamos de ultimas el javascript para no interrumpir la carga de la pagina-->
+<!--Cargamos de ultimas el javascript para no interrumpir la carga de la pagina-->
 
 </body>
 

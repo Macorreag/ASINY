@@ -21,3 +21,12 @@
 tr:hover td {
 background-color: rgba(242, 117, 42,0.5);
 }
+
+.test div{
+  font-size:10px;
+  background-color:green;
+  text-align:right;
+  padding:3px;
+  margin:1px;
+  color:white;
+}

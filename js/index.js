@@ -133,6 +133,8 @@ var markers = [];
 var topTen = [];
 var globale = [];
 
+var filteredCD = [];
+
 var topTen = [
 	{
 		"positionArray":"0",
@@ -330,11 +332,63 @@ function separateByBoroughts( array ){
 	}
 	return boroughts;
 }
+class BarChart {
+  constructor(data,maxX,nameClass) {
+    this._data = data;
+    this._maxX = maxX;
+    this._nameClass = nameClass;
+    /*Ancho de las barras determinada por escala va desde 0[CERO TEMPORAL EL MINIMO DEBE CAMBIAR] hasta ---*/
 
+  }
+
+  get data() {
+    return this._data;
+  }
+  get maxX() {
+    return this._behavior;
+  }
+  get nameClass(){
+    return this._nameClass;
+  }
+
+  get escalaX(){
+    return this._escalaX;
+  }
+
+
+
+  graficar(){
+  /*Toma del DOM la clase barras y todos los divs que tiene adentro ,luego con data va añadiendo div POR CADA DATO*/
+
+    var escalaX = d3.scale.linear().domain([0,d3.max(this._data)]).range([0,this._maxX]);
+   var array = d3.select(this.nameClass);
+    var test = array.select("div");
+    //test.style("background-color"," red");
+    //d3.select(this.nameClass).selector([5]).style("background-color"," red");
+    //d3.select(this.nameClass).filter(3).style("background-color","blue");
+    var even =  array.select( function ( d , i ) { return i &  1  ?  this  :  null ;});
+   /* alert("aqui esta el problema no puedo dividir la seleccion y por ende no puedo modificar directamente las caracteristicas de una sola division esto se debe realizar en cada swap la otra forma seria dibujar de nuevo todo el arreglo pero se sobrecargara el DOM");*/
+
+    //var test2 = array.selectAll("div",3);
+    //test2.style("background-color"," blue");
+    //test.
+    //var b =  d3 . selectAll ( " p " ). select ( " b " );
+   //alert(test);
+    //alert(test);
+  d3.select(this.nameClass).selectAll("div").data(this.data).enter().append('div').style("width",function(d){
+    /*Retorna un valor para el estilo en pixeles dentro del rango definido en escala y el parametro d corresponde al dato del arreglo*/
+    return d +"%";
+    /*tamaño determinado por el ancho del viewport*/
+  })
+  .text(function(d){
+    return d;
+  })
+}
+
+}
 
 $("document").ready(function(){
 	shapes =	getDataShapeDistric(SHAPECD);
-
 	//separateByBoroughts(shapes);
 
 	//neighborhoods
@@ -346,7 +400,7 @@ $("document").ready(function(){
 		onClickRow: function (row,$element){
 			console.log(row);
 			$element.css({backgroundColor: row.color});
-			drawNB(shapes[row.positionArray]);
+			drawNB(filteredCD[row.positionArray]);
 		},
 
 		clickToSelect:true,
@@ -361,6 +415,18 @@ $("document").ready(function(){
 	//drawNB(shapes[3].coordLimits);
 	//fillData();
 
+
+
+	var  mata = [3,42,100,32,5];
+
+	/*Instanciando la clase*/
+	var barrasTest =  new BarChart(mata,300,".test");
+
+
+
+	barrasTest.graficar();
+
+
 });
 
 
@@ -369,17 +435,7 @@ async function fillData(){
 	getDataNeighborhood(NAMESNEIGHBORHOOD);
 	neighborhoodToCD();
 		console.log(boroughts);
-	for(var iter = 1 ;iter < 10; iter++){
-		topTen.push(
-			{
-				"positionArray":iter,
-				"id":shapes[iter].id,
-				"district":shapes[iter].borough,
-				"color":shapes[iter].color
-			}
-		);
-	}
-	$('#table').bootstrapTable('updateRow',6);
+
 }
 
 /*FOR TEST
@@ -463,8 +519,19 @@ async function sortByDistance(){
 			}
 		}
 	}
-	var  filteredCD = shapes.filter(dis => dis.distanceCar> 0);
+	 filteredCD = shapes.filter(dis => dis.distanceCar> 0);
 
-			filteredCD.sort(compareBydistance(a,b ));
+			filteredCD.sort(compareBydistance);
 			console.log(filteredCD);
+			for(var iter = 0 ;iter < 10; iter++){
+				topTen.push(
+					{
+						"positionArray":iter,
+						"id":filteredCD[iter].id,
+						"district":filteredCD[iter].borough,
+						"color":filteredCD[iter].color
+					}
+				);
+			}
+			$('#table').bootstrapTable('updateRow',6);
 }
