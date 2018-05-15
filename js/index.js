@@ -65,7 +65,8 @@ var point = new google.maps.LatLng(
 return point;
 }
 
-function neighborhoodToCD(){
+async function neighborhoodToCD(){
+
 	for(var i = 0 ;i < neighborhoods.length; i++){
 		var numberBoro= BOROUGH.indexOf(neighborhoods[i].district);
 		for(var j = 0; j < boroughts[numberBoro].length ; j++){
@@ -74,6 +75,7 @@ function neighborhoodToCD(){
 			}
 		}
 	}
+
 }
 
 /*Functions for Google Maps*/
@@ -150,7 +152,7 @@ class Neighborhood {
 		this._district = district;
 		this._coordLimits = coordLimits;
 		this.distanceWalk  ,
-		this.distanceCar  ,
+		this.distanceCar  = [],
 		this.distanceTransport  ,
 		this.timeWalk  ,
 		this.timeCar  ,
@@ -181,7 +183,6 @@ class CommunityDistrict {
 		this._id = Number(num),
 		this._coordLimits = coordLimits,
 		this._neighborhoods = [],
-		this._distanceCar = null,
 		this._multiPolygon;
 		if(JIA.includes(this._id)){
 			/*JIA is a different color for the user*/
@@ -196,13 +197,7 @@ class CommunityDistrict {
 	get multiPolygon(){
 		return this._multiPolygon;
 	}
-	 get  distanceCar(){
-		//if(this.distanceCar == NULL){
-		return distances(this._neighborhoods);
-		//}else{
-			//return this._distanceCar;
-		//}
-	}
+
 	get neighborhoods(){
 		return this._neighborhoods;
 	}
@@ -338,14 +333,14 @@ function separateByBoroughts( array ){
 
 
 $("document").ready(function(){
-	shapes = getDataShapeDistric(SHAPECD);
+	shapes =	getDataShapeDistric(SHAPECD);
+
 	//separateByBoroughts(shapes);
 
 	//neighborhoods
 	//var data =  getDataShapeDistric(SHAPECD);
 	//getDataNeighborhood(NAMESNEIGHBORHOOD);
 
-	neighborhoods
 	$('#table').bootstrapTable({
 		data:topTen,
 		onClickRow: function (row,$element){
@@ -369,8 +364,8 @@ $("document").ready(function(){
 });
 
 
-function fillData(){
-separateByBoroughts(shapes);
+async function fillData(){
+	separateByBoroughts(shapes);
 	getDataNeighborhood(NAMESNEIGHBORHOOD);
 	neighborhoodToCD();
 		console.log(boroughts);
@@ -418,38 +413,58 @@ function getJSON( url ){
 	})
 }
 
-function calculateDistanceCar( origins , destination){
+function calculateDistanceCar( communityD ){
+
 	var distanceMatrixService = new google.maps.DistanceMatrixService;
-	var devolution = null;
-	var valPro = new Promise(resolve => {
+	var neighborhoodsDis = communityD.neighborhoods.map(a => a.coorCenter);
+return new Promise(resolve => {
 	setTimeout(() => {
 	distanceMatrixService.getDistanceMatrix({
-		origins: origins,
-		destinations: [destination],
+		origins: neighborhoodsDis,
+		destinations: [coordUniversity],
 		unitSystem: google.maps.UnitSystem.METRIC,
 		travelMode: google.maps.DirectionsTravelMode.DRIVING,
 
-	},function(response, status) {
+	},function(response, status){
 		if (status !== google.maps.DistanceMatrixStatus.OK) {
-			window.alert('Error was: ' + status);
+			window.alert('Error Distance was: ' + status);
 		} else {
-
-			//devolution = response;
-				resolve(valPro)
-			//resolve(devolution);
-			//return response;
+			var sumDistance = 0;
+			for (var i = 0 ; i < communityD.neighborhoods.length ; i++){
+				communityD.neighborhoods[i].distanceCar.push(response.rows[i]);
+				sumDistance += response.rows[i].elements[0].distance.value;
+			}
+			/*Average cast to KM*/
+			communityD.distanceCar = sumDistance/(1000*communityD.neighborhoods.length);
+			resolve('resolved');
 		}
-	});
+	})
 
-	return devolution;
-	}, 1000);
-  });
+}, 400);
 
+ })
 }
-//var result = boroughts[0][0].neighborhoods.map(a => a.coorCenter);
-async function distances(neighborhoods){
-	var neighborhoodsDis = neighborhoods.map(a => a.coorCenter);
-//	this._distanceCar = calculateDistanceCar(neighborhoodsDis,coordUniversity);
-	var distances = await calculateDistanceCar(neighborhoodsDis,coordUniversity);
-	return distances;
+function compareBydistance(a,b) {
+	if (a.distanceCar < b.distanceCar)
+	return -1;
+	if (a.distanceCar > b.distanceCar)
+	return 1;
+	return 0;
+}
+
+async function sortByDistance(){
+	for(var i = 0;i < boroughts.length ;i++ ){
+		for (var j = 0;j <boroughts[i].length ;j++){
+			if(boroughts[i][j].neighborhoods.length > 0 && boroughts[i][j].habitable){
+				//setTimeout(
+				await calculateDistanceCar(boroughts[i][j]),
+				console.log(i)
+				//, i*1000);
+			}
+		}
+	}
+	var  filteredCD = shapes.filter(dis => dis.distanceCar> 0);
+
+			filteredCD.sort(compareBydistance(a,b ));
+			console.log(filteredCD);
 }
