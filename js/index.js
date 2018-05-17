@@ -169,7 +169,6 @@ function drawNeigh(array){
 }
 /*/Clean Code/Clean Code/Clean Code/Clean Code/Clean Code/Clean Code/Clean Code/Clean Code*/
 
-
 /*JSON filtered */
 
 var borough=[];
@@ -181,15 +180,6 @@ var map;
 
 /*Community District Sorted By distance between neighborhoods to NYU*/
 var filteredCD = [];
-
-var topTen = [
-	{"positionArray":0,
-	"id":0,
-	"district":0,
-	"color":0
-}
-];
-
 
 class Neighborhood {
 	/*In the communityDistrict*/
@@ -266,13 +256,6 @@ class CommunityDistrict {
 		return this._color;
 	}
 }
-
-
-
-
-
-
-
 
 function getDataNeighborhood(){
 	/*Como parametro podria tener la URL */
@@ -366,37 +349,22 @@ $("document").ready(function(){
 	borough = getDataShapeDistric();
 	setTimeout(getDataNeighborhood,1000);
 
+var  mata = [3,42,100,32,5];
+/*Instanciando la clase*/
+var barrasTest =  new BarChart(mata,300,".test");
 
+barrasTest.graficar();
 
-
-	/*x(borough, function(val){
-	val =
-	(val);
 });
-*/
-//separateByBoroughts(getDataShapeDistric);
-//pullData().then(function(value) {
-//	var yuca = Promise.resolve(getDataShapeDistric(SHAPECD));
-//separateByBoroughts(Promise.resolve(getDataShapeDistric(SHAPECD)));
-//yuca.then(function(value) {
-//borough = value;
 
-//});
-//separateByBoroughts(Promise.resolve(borough));
-//var casa = pullData();
-//console.log(casa);
-
-//neighborhoods
-//var data =  getDataShapeDistric(SHAPECD);
-//getDataNeighborhood(NAMESNEIGHBORHOOD);
-
+function updateTable(){
 $('#table').bootstrapTable({
 
-	data:topTen,
+	data:filteredCD,
 	onClickRow: function (row,$element){
 		console.log(row);
 		$element.css({backgroundColor: row.color});
-		drawCD(filteredCD[row.positionArray]);
+		drawCD(row);
 	},
 
 	clickToSelect:true,
@@ -410,26 +378,7 @@ $('#table').bootstrapTable({
 
 	//checkbox: true,
 });
-//drawNB(borough[3].coordLimits);
-//fillData();
-
-
-
-var  mata = [3,42,100,32,5];
-
-/*Instanciando la clase*/
-var barrasTest =  new BarChart(mata,300,".test");
-
-
-
-barrasTest.graficar();
-
-
-});
-
-
-
-
+}
 /*FOR TEST
 */
 
@@ -484,42 +433,31 @@ function drawCD( communityD ){
 	drawNeigh(communityD.neighborhoods);
 	nbBoundaries.setMap(map);
 }
-
+function controlCharge(status){
+	$('.progress-bar').text( status+"% Loading" );
+	$('.progress-bar').css( "width",status+"%" );
+	if(status == 100){
+		$('.progress-bar').removeClass( "progress-bar-striped progress-bar-animated " );
+		$('.progress-bar').addClass("bg-success");
+	}else{
+		$('.progress-bar').addClass("progress-bar-striped progress-bar-animated ");
+		$('.progress-bar').removeClass("bg-success");
+	}
+}
 async function calculateDistances(){
-	$('.progress-bar').css( "color","white" );
 	for(var i = 0;i < borough.length ;i++ ){
 		for (var j = 0;j <borough[i].length ;j++){
 			if(borough[i][j].neighborhoods.length > 0 ){
 				filteredCD.push(borough[i][j]);
 				await calculateDistanceCar(borough[i][j]);
-				$('.progress-bar').text( i*25+"% Loading" );
-				$('.progress-bar').css( "width",i*25+"%" );
-				if(i == 4){
-					$('.progress-bar').removeClass( "progress-bar-striped progress-bar-animated" );
-				}
-				console.log(i);
 			}
 		}
+		controlCharge(i*25);
 	}
 }
 async function sortByDistance(){
 	await calculateDistances();
 	filteredCD.sort(compareBydistance);
-	console.log(filteredCD);
-	topTen[0].positionArray = 0;
-	topTen[0].id = filteredCD[0].id ;
-	topTen[0].district = filteredCD[0].borough ;
-	topTen[0].color = filteredCD[0].color;
-
-	for(var iter = 1 ;iter < filteredCD.length; iter++){
-		topTen.push(
-			{
-				"positionArray":iter,
-				"id":filteredCD[iter].id,
-				"district":filteredCD[iter].borough,
-				"color":filteredCD[iter].color
-			}
-		);
-	}
+	updateTable();
 	$('#table').bootstrapTable('updateRow',0);
 }
