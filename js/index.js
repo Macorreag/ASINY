@@ -15,7 +15,6 @@ features[i].geometry.coordinates[j] = Coordinates of Shape
 const BOROUGH = ["Manhattan", "Bronx", "Brooklyn", "Queens", "Staten Island"];
 
 /*(Joint of Interest Areas) Not living posible Areas*/
-const JIA = [164,226,227,228,355,356,480,481,482,483,484,595];
 var colorJIA = "rgba(0, 0, 0, 0.9)";
 
 
@@ -62,21 +61,18 @@ function coordinateGmaps( chain ){
 	return point;
 }
 
-async function neighborhoodToCD(){
-	for(var i = 0 ;i < neighborhoods.length; i++){
-		var numberBoro= BOROUGH.indexOf(neighborhoods[i].district);
-
-		for(var j = 0; j < boroughts[numberBoro].length ; j++){
-			if(pointInPath(neighborhoods[i].coorCenter, boroughts[numberBoro][j].coordLimits)){
-				boroughts[numberBoro][j].neighborhoods.push(neighborhoods[i]);
-			}
+function neighborhoodToCD(neighborhood,numberBoro){
+	for(var i = 0; i < borough[numberBoro].length ; i++){
+		if(pointInPath(neighborhood.coorCenter, borough[numberBoro][i].coordLimits)){
+			borough[numberBoro][i].neighborhoods.push(neighborhood);
 		}
 	}
-
 }
+
+
 function getDataShapeDistric(){
-	/*Organize DataSets of Shapes */
-	var geoCD = [];
+	/*Organize DataSets of borough */
+	var geoCD = [[],[],[],[],[]];
 	var data = $.get(SHAPECD, () => {})
 	.done(function () {
 		var responseJSON = JSON.parse(data.responseText)
@@ -115,8 +111,10 @@ function getDataShapeDistric(){
 				subShape,
 				multiPolygon /*Is a multipolygon*/
 			);
-			geoCD.push(communityDistrict);
+			/*SortByCommunityDistrict*/
+			geoCD[numberBorough(responseJSON.features[i].properties.BoroCD)].push(communityDistrict);
 		}
+
 	}).fail(function (error) {
 		console.error(error);
 	})
@@ -160,24 +158,28 @@ function pointInPath( point , coordLimits){
 	true:
 	false;
 }
-
+function drawNeigh(array){
+	for( var i = 0 ;i <array.length ; i++){
+		var marker = new google.maps.Marker({
+			position: array[i].coorCenter,
+			map: map,
+			title: array[i].name
+		});
+	}
+}
 /*/Clean Code/Clean Code/Clean Code/Clean Code/Clean Code/Clean Code/Clean Code/Clean Code*/
 
 
 /*JSON filtered */
-var neighborhoods = [];
-var nbInfo = [];
-var shapes=[];
-var boroughts = [];
+
+var borough=[];
 
 /*Variables for GMaps*/
 var map;
-var markers = [];
 
 /*ranking variables*/
-var topTen = [];
-var globale = [];
 
+/*Community District Sorted By distance between neighborhoods to NYU*/
 var filteredCD = [];
 
 var topTen = [
@@ -185,7 +187,7 @@ var topTen = [
 	"id":0,
 	"district":0,
 	"color":0
-	}
+}
 ];
 
 
@@ -229,11 +231,12 @@ class CommunityDistrict {
 		this._coordLimits = coordLimits,
 		this._neighborhoods = [],
 		this._multiPolygon = multiPol;
-		if(JIA.includes(this._id)){
+		if((num-(numberBorough(num)+1)*100) < 26){
 			/*JIA is a different color for the user*/
-			this._color = colorJIA;
-		}else{
 			this._color = randomColorRGBA(0.6); /*Problema colores muy similares*/
+		}else{
+			this._color = colorJIA;
+
 		}
 	}
 	get id() {
@@ -253,7 +256,7 @@ class CommunityDistrict {
 		return this._coordLimits;
 	}
 	get habitable(){
-		if(this._neighborhoods.length > 0){ /*Validate if is habitable*/
+		if((thi._id-(numberBorough(thi._id)+1)*100) < 26){ /*Validate if is habitable*/
 			return true;
 		}else {
 			return false;
@@ -271,19 +274,19 @@ class CommunityDistrict {
 
 
 
-function getDataNeighborhood(URL){
+function getDataNeighborhood(){
 	/*Como parametro podria tener la URL */
-	var data = $.get(URL,function(){})
+	var data = $.get(NAMESNEIGHBORHOOD,function(){})
 	.done(function(){
 		let responseJSON = JSON.parse(data.responseText);
 		for(var i = 0 ;i < data.responseJSON.data.length ;i++){
 			var neighborhood = new Neighborhood(
 				data.responseJSON.data[i][10],
 				data.responseJSON.data[i][9],
-				data.responseJSON.data[i][16],/**/
 				""
 			);
-			neighborhoods.push(neighborhood);
+			var numberB= BOROUGH.indexOf(data.responseJSON.data[i][16]);
+			neighborhoodToCD(neighborhood,numberB);
 		}
 	})
 	.fail(function(error){
@@ -299,12 +302,7 @@ function compareById(a,b) {
 	return 0;
 }
 
-function separateByBoroughts( array ){
-	for (var i = 0 ;i < BOROUGH.length  ; i++){
-		var  filteredCD = array.filter(dis => numberBorough(dis.id) == i);
-		boroughts.push(filteredCD);
-	}
-}
+
 
 
 
@@ -365,15 +363,13 @@ class BarChart {
 
 
 $("document").ready(function(){
-	shapes = getDataShapeDistric();
-	getDataNeighborhood(NAMESNEIGHBORHOOD);
-	setTimeout(separateByBoroughts, 2000);/*Is Wrong controll Async Execute*/
-	setTimeout(neighborhoodToCD,5000);
-	setTimeout(calculateDistances,10000);
+	borough = getDataShapeDistric();
+	setTimeout(getDataNeighborhood,1000);
 
 
 
-	/*x(shapes, function(val){
+
+	/*x(borough, function(val){
 	val =
 	(val);
 });
@@ -383,10 +379,10 @@ $("document").ready(function(){
 //	var yuca = Promise.resolve(getDataShapeDistric(SHAPECD));
 //separateByBoroughts(Promise.resolve(getDataShapeDistric(SHAPECD)));
 //yuca.then(function(value) {
-//shapes = value;
+//borough = value;
 
 //});
-//separateByBoroughts(Promise.resolve(shapes));
+//separateByBoroughts(Promise.resolve(borough));
 //var casa = pullData();
 //console.log(casa);
 
@@ -400,7 +396,7 @@ $('#table').bootstrapTable({
 	onClickRow: function (row,$element){
 		console.log(row);
 		$element.css({backgroundColor: row.color});
-		drawNB(filteredCD[row.positionArray]);
+		drawCD(filteredCD[row.positionArray]);
 	},
 
 	clickToSelect:true,
@@ -414,7 +410,7 @@ $('#table').bootstrapTable({
 
 	//checkbox: true,
 });
-//drawNB(shapes[3].coordLimits);
+//drawNB(borough[3].coordLimits);
 //fillData();
 
 
@@ -436,34 +432,9 @@ barrasTest.graficar();
 
 /*FOR TEST
 */
-function drawNeigh(array){
-	for( var i = 0 ;i <array.length ; i++){
-		var marker = new google.maps.Marker({
-			position: array[i].coorCenter,
-			map: map,
-			title: 'Hello World!'
-		});
-	}
 
-}
-function countNeigh(){
-	var num = 0;
-	for (var i=0;i <boroughts.length;i++){
-		for (var j=0;j <boroughts[i].length ;j++){
-			num += boroughts[i][j].neighborhoods.length;
-		}
-	}
-	console.log(num);
-}
-function getJSON( url ){
-	var data = $.get(url,function(){})
-	.done(function(){
-		//return responseJSON = JSON.parse(data.responseText)
-		console.log(data);
-	}).fail(function(error){
-		console.log(error);
-	})
-}
+
+
 
 function calculateDistanceCar( communityD ){
 
@@ -492,7 +463,7 @@ function calculateDistanceCar( communityD ){
 				}
 			})
 
-		}, 400);
+		}, 350);
 
 	})
 }
@@ -503,25 +474,26 @@ function compareBydistance(a,b) {
 	return 1;
 	return 0;
 }
-function drawNB( shape ){
+function drawCD( communityD ){
 	var nbBoundaries = new google.maps.Polygon({
-		paths: shape.coordLimits,
-		strokeColor: shape.color,
+		paths: communityD.coordLimits,
+		strokeColor: communityD.color,
 		strokeWeight: 2,
-		fillColor: shape.color
+		fillColor: communityD.color
 	});
+	drawNeigh(communityD.neighborhoods);
 	nbBoundaries.setMap(map);
 }
 
 async function calculateDistances(){
-	for(var i = 0;i < boroughts.length ;i++ ){
-		for (var j = 0;j <boroughts[i].length ;j++){
-			if(boroughts[i][j].neighborhoods.length > 0 ){
-				filteredCD.push(boroughts[i][j]);
-
-				await calculateDistanceCar(boroughts[i][j]);
-				$('.progress-bar').text( i*25+"%" );
-				$('.progress-bar').css( "width",i*25+"%" )	;
+	$('.progress-bar').css( "color","white" );
+	for(var i = 0;i < borough.length ;i++ ){
+		for (var j = 0;j <borough[i].length ;j++){
+			if(borough[i][j].neighborhoods.length > 0 ){
+				filteredCD.push(borough[i][j]);
+				await calculateDistanceCar(borough[i][j]);
+				$('.progress-bar').text( i*25+"% Loading" );
+				$('.progress-bar').css( "width",i*25+"%" );
 				if(i == 4){
 					$('.progress-bar').removeClass( "progress-bar-striped progress-bar-animated" );
 				}
@@ -530,9 +502,9 @@ async function calculateDistances(){
 		}
 	}
 }
-function sortByDistance(){
-
-filteredCD.sort(compareBydistance);
+async function sortByDistance(){
+	await calculateDistances();
+	filteredCD.sort(compareBydistance);
 	console.log(filteredCD);
 	topTen[0].positionArray = 0;
 	topTen[0].id = filteredCD[0].id ;

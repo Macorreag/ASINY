@@ -6,15 +6,19 @@
     margin: 0;
     padding: 0;
 }
-    
+
 .panel{
     background: linear-gradient(to right, rgba(0, 0, 0, 0.7 ) , rgba(19, 47, 196, 0.7));
     color: rgb(255, 255, 255);
     /*overflow: scroll;*/
 }
 .dropdown{
+  color: white;
   display: inline;
 
+}
+.navbar{
+  color: white;
 }
 .table{
   overflow: scroll;
@@ -30,4 +34,7 @@ background-color: rgba(242, 117, 42,0.5);
   padding:3px;
   margin:1px;
   color:white;
+}
+.progress-bar{
+  color: rgb(0, 0, 0);
 }
