@@ -20,9 +20,7 @@
 .navbar{
   color: white;
 }
-.table{
-  overflow: scroll;
-}
+
 tr:hover td {
 background-color: rgba(242, 117, 42,0.5);
 }

@@ -22,6 +22,19 @@ const coordUniversity = {	/*Position University*/
 	lat:40.7291, lng:-73.9965
 };
 
+/*JSON filtered */
+
+var borough=[];
+
+/*Variables for GMaps*/
+var map;
+
+/*ranking variables*/
+var maxDistance = 0;
+var flagConsultedDistances = 0;
+/*Community District Sorted By distance between neighborhoods to NYU*/
+var filteredCD = [];
+
 /*
 Objects
 BOROUGH[
@@ -167,19 +180,10 @@ function drawNeigh(array){
 		});
 	}
 }
+
+
 /*/Clean Code/Clean Code/Clean Code/Clean Code/Clean Code/Clean Code/Clean Code/Clean Code*/
 
-/*JSON filtered */
-
-var borough=[];
-
-/*Variables for GMaps*/
-var map;
-
-/*ranking variables*/
-
-/*Community District Sorted By distance between neighborhoods to NYU*/
-var filteredCD = [];
 
 class Neighborhood {
 	/*In the communityDistrict*/
@@ -217,9 +221,9 @@ class Neighborhood {
 class CommunityDistrict {
 	/*CommunityDistrict in the 5 district */
 	constructor(num,coordLimits,multiPol){
-		this._id = Number(num),
-		this._coordLimits = coordLimits,
-		this._neighborhoods = [],
+		this._id = Number(num);
+		this._coordLimits = coordLimits;
+		this._neighborhoods = [];
 		this._multiPolygon = multiPol;
 		if((num-(numberBorough(num)+1)*100) < 26){
 			/*JIA is a different color for the user*/
@@ -246,7 +250,7 @@ class CommunityDistrict {
 		return this._coordLimits;
 	}
 	get habitable(){
-		if((thi._id-(numberBorough(thi._id)+1)*100) < 26){ /*Validate if is habitable*/
+		if((this._id-(numberBorough(this._id)+1)*100) < 26){ /*Validate if is habitable*/
 			return true;
 		}else {
 			return false;
@@ -255,6 +259,7 @@ class CommunityDistrict {
 	get color(){
 		return this._color;
 	}
+
 }
 
 function getDataNeighborhood(){
@@ -297,7 +302,6 @@ class BarChart {
 		/*Ancho de las barras determinada por escala va desde 0[CERO TEMPORAL EL MINIMO DEBE CAMBIAR] hasta ---*/
 
 	}
-
 	get data() {
 		return this._data;
 	}
@@ -311,9 +315,6 @@ class BarChart {
 	get escalaX(){
 		return this._escalaX;
 	}
-
-
-
 	graficar(){
 		/*Toma del DOM la clase barras y todos los divs que tiene adentro ,luego con data va añadiendo div POR CADA DATO*/
 
@@ -335,7 +336,7 @@ class BarChart {
 		d3.select(this.nameClass).selectAll("div").data(this.data).enter().append('div').style("width",function(d){
 			/*Retorna un valor para el estilo en pixeles dentro del rango definido en escala y el parametro d corresponde al dato del arreglo*/
 			return d +"%";
-			/*tamaño determinado por el ancho del viewport*/
+
 		})
 		.text(function(d){
 			return d;
@@ -371,12 +372,13 @@ $('#table').bootstrapTable({
 	//onlyInfoPagination:true,
 	//rememberOrder:true,
 	pagination:true,
+	checkbox: true,
 	onCheck: function(row,$element){
 
 		alert("hi");
 	}
 
-	//checkbox: true,
+
 });
 }
 /*FOR TEST
@@ -386,7 +388,6 @@ $('#table').bootstrapTable({
 
 
 function calculateDistanceCar( communityD ){
-
 	var distanceMatrixService = new google.maps.DistanceMatrixService;
 	var neighborhoodsDis = communityD.neighborhoods.map(a => a.coorCenter);
 	return new Promise(resolve => {
@@ -402,12 +403,18 @@ function calculateDistanceCar( communityD ){
 					window.alert('Error Distance was: ' + status);
 				} else {
 					var sumDistance = 0;
-					for (var i = 0 ; i < communityD.neighborhoods.length ; i++){
+					var numberNeigh = communityD.neighborhoods.length;
+					for (var i = 0 ; i < numberNeigh ; i++){
 						communityD.neighborhoods[i].distanceCar.push(response.rows[i]);
 						sumDistance += response.rows[i].elements[0].distance.value;
 					}
 					/*Average cast to KM*/
-					communityD.distanceCar = sumDistance/(1000*communityD.neighborhoods.length);
+					var averageDistance = sumDistance/(1000*numberNeigh);
+					if(maxDistance < averageDistance){
+						/*Save max distance for calculate Number of points*/
+						maxDistance = averageDistance;
+					}
+					communityD.distanceCar = sumDistance/(1000*numberNeigh);
 					resolve('resolved');
 				}
 			})
@@ -416,7 +423,7 @@ function calculateDistanceCar( communityD ){
 
 	})
 }
-function compareBydistance(a,b) {
+function compareByDistances(a,b) {
 	if (a.distanceCar < b.distanceCar)
 	return -1;
 	if (a.distanceCar > b.distanceCar)
@@ -447,7 +454,7 @@ function controlCharge(status){
 async function calculateDistances(){
 	for(var i = 0;i < borough.length ;i++ ){
 		for (var j = 0;j <borough[i].length ;j++){
-			if(borough[i][j].neighborhoods.length > 0 ){
+			if(borough[i][j].habitable){
 				filteredCD.push(borough[i][j]);
 				await calculateDistanceCar(borough[i][j]);
 			}
@@ -456,8 +463,20 @@ async function calculateDistances(){
 	}
 }
 async function sortByDistance(){
-	await calculateDistances();
-	filteredCD.sort(compareBydistance);
+	//if(flagConsultedDistances == 0){
+		$('#exampleModalCenter').modal('toggle');
+		$('#distance').addClass("btn-danger");
+		$('#distance').prop('disabled', true);
+		await calculateDistances();
+		$('#distance').prop('disabled', false);
+		document.getElementById("distance").setAttribute('onclick','sortByPreferences()')
+		//flagConsultedDistances = 1;
+	//}
+
+	sortByPreferences();
+}
+function sortByPreferences(){
+	filteredCD.sort(compareByDistances);
 	updateTable();
-	$('#table').bootstrapTable('updateRow',0);
+	//$('#table').bootstrapTable('updateRow',0);
 }
