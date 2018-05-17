@@ -31,7 +31,7 @@ var map;
 
 /*ranking variables*/
 var maxDistance = 0;
-var flagConsultedDistances = 0;
+var preferenceDistance ;
 /*Community District Sorted By distance between neighborhoods to NYU*/
 var filteredCD = [];
 
@@ -350,36 +350,38 @@ $("document").ready(function(){
 	borough = getDataShapeDistric();
 	setTimeout(getDataNeighborhood,1000);
 
-var  mata = [3,42,100,32,5];
-/*Instanciando la clase*/
-var barrasTest =  new BarChart(mata,300,".test");
+	var  mata = [3,42,100,32,5];
+	/*Instanciando la clase*/
+	var barrasTest =  new BarChart(mata,300,".test");
 
-barrasTest.graficar();
+	barrasTest.graficar();
 
 });
 
 function updateTable(){
-$('#table').bootstrapTable({
 
-	data:filteredCD,
-	onClickRow: function (row,$element){
-		console.log(row);
-		$element.css({backgroundColor: row.color});
-		drawCD(row);
-	},
+	/*SORT BY ACTIVE PARAMETERS*/
+	$('#table').bootstrapTable({
 
-	clickToSelect:true,
-	//onlyInfoPagination:true,
-	//rememberOrder:true,
-	pagination:true,
-	checkbox: true,
-	onCheck: function(row,$element){
+		data:filteredCD,
+		onClickRow: function (row,$element){
+			console.log(row);
+			$element.css({backgroundColor: row.color});
+			drawCD(row);
+		},
 
-		alert("hi");
-	}
+		clickToSelect:true,
+		//onlyInfoPagination:true,
+		//rememberOrder:true,
+		pagination:true,
+		checkbox: true,
+		onCheck: function(row,$element){
+
+			alert("hi");
+		}
 
 
-});
+	});
 }
 /*FOR TEST
 */
@@ -444,9 +446,11 @@ function controlCharge(status){
 	$('.progress-bar').text( status+"% Loading" );
 	$('.progress-bar').css( "width",status+"%" );
 	if(status == 100){
+		$('#Status').text("Loaded Data");
 		$('.progress-bar').removeClass( "progress-bar-striped progress-bar-animated " );
 		$('.progress-bar').addClass("bg-success");
 	}else{
+		$('#Status').text( status+"% Loading" );
 		$('.progress-bar').addClass("progress-bar-striped progress-bar-animated ");
 		$('.progress-bar').removeClass("bg-success");
 	}
@@ -463,19 +467,26 @@ async function calculateDistances(){
 	}
 }
 async function sortByDistance(){
-	//if(flagConsultedDistances == 0){
-		$('#exampleModalCenter').modal('toggle');
-		$('#distance').addClass("btn-danger");
-		$('#distance').prop('disabled', true);
-		await calculateDistances();
-		$('#distance').prop('disabled', false);
-		document.getElementById("distance").setAttribute('onclick','sortByPreferences()')
-		//flagConsultedDistances = 1;
-	//}
-
+	$('#ModalDistance').modal('toggle');
+	$('#distance').addClass("btn-danger");
+	$('#distance').prop('disabled', true);
+	await calculateDistances();
+	$('#distance').prop('disabled', false);
+	$('#distance').removeClass("btn-danger");
+	document.getElementById("distance").setAttribute('onclick','sortByPreferences()')
 	sortByPreferences();
 }
+function pressButton( button ){
+	if( button.hasClass("btn-primary") ){
+		button.removeClass("btn-primary");
+		return false;
+	}else{
+		button.addClass("btn-primary");
+		return true;
+	}
+}
 function sortByPreferences(){
+	preferenceDistance = pressButton($('#distance'));
 	filteredCD.sort(compareByDistances);
 	updateTable();
 	//$('#table').bootstrapTable('updateRow',0);
