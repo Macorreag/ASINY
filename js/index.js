@@ -299,9 +299,9 @@ function compareById(a,b) {
 	return 0;
 }
 
-function separateByBoroughts(){
+function separateByBoroughts( array ){
 	for (var i = 0 ;i < BOROUGH.length  ; i++){
-		var  filteredCD = shapes.filter(dis => numberBorough(dis.id) == i);
+		var  filteredCD = array.filter(dis => numberBorough(dis.id) == i);
 		boroughts.push(filteredCD);
 	}
 }
@@ -502,6 +502,15 @@ function compareBydistance(a,b) {
 	if (a.distanceCar > b.distanceCar)
 	return 1;
 	return 0;
+}
+function drawNB( shape ){
+	var nbBoundaries = new google.maps.Polygon({
+		paths: shape.coordLimits,
+		strokeColor: shape.color,
+		strokeWeight: 2,
+		fillColor: shape.color
+	});
+	nbBoundaries.setMap(map);
 }
 
 async function calculateDistances(){
