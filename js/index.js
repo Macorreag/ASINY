@@ -161,8 +161,169 @@ function setMarker(image,coordinates,textHover) {
 function initMap() {
 	map = new google.maps.Map(document.getElementById('map'), {
 		center: coordUniversity,
-		zoom: 11
+		zoom: 11,
 		/*29 levels to Zoom*/
+		styles:[
+  {
+    "elementType": "geometry",
+    "stylers": [
+      {
+        "color": "#242f3e"
+      }
+    ]
+  },
+  {
+    "elementType": "labels.text.fill",
+    "stylers": [
+      {
+        "color": "#746855"
+      }
+    ]
+  },
+  {
+    "elementType": "labels.text.stroke",
+    "stylers": [
+      {
+        "color": "#242f3e"
+      }
+    ]
+  },
+  {
+    "featureType": "administrative.locality",
+    "elementType": "labels.text.fill",
+    "stylers": [
+      {
+        "color": "#d59563"
+      }
+    ]
+  },
+  {
+    "featureType": "poi",
+    "elementType": "labels.text.fill",
+    "stylers": [
+      {
+        "color": "#d59563"
+      }
+    ]
+  },
+  {
+    "featureType": "poi.park",
+    "elementType": "geometry",
+    "stylers": [
+      {
+        "color": "#263c3f"
+      }
+    ]
+  },
+  {
+    "featureType": "poi.park",
+    "elementType": "labels.text.fill",
+    "stylers": [
+      {
+        "color": "#6b9a76"
+      }
+    ]
+  },
+  {
+    "featureType": "road",
+    "elementType": "geometry",
+    "stylers": [
+      {
+        "color": "#38414e"
+      }
+    ]
+  },
+  {
+    "featureType": "road",
+    "elementType": "geometry.stroke",
+    "stylers": [
+      {
+        "color": "#212a37"
+      }
+    ]
+  },
+  {
+    "featureType": "road",
+    "elementType": "labels.text.fill",
+    "stylers": [
+      {
+        "color": "#9ca5b3"
+      }
+    ]
+  },
+  {
+    "featureType": "road.highway",
+    "elementType": "geometry",
+    "stylers": [
+      {
+        "color": "#746855"
+      }
+    ]
+  },
+  {
+    "featureType": "road.highway",
+    "elementType": "geometry.stroke",
+    "stylers": [
+      {
+        "color": "#1f2835"
+      }
+    ]
+  },
+  {
+    "featureType": "road.highway",
+    "elementType": "labels.text.fill",
+    "stylers": [
+      {
+        "color": "#f3d19c"
+      }
+    ]
+  },
+  {
+    "featureType": "transit",
+    "elementType": "geometry",
+    "stylers": [
+      {
+        "color": "#2f3948"
+      }
+    ]
+  },
+  {
+    "featureType": "transit.station",
+    "elementType": "labels.text.fill",
+    "stylers": [
+      {
+        "color": "#d59563"
+      }
+    ]
+  },
+  {
+    "featureType": "water",
+    "elementType": "geometry",
+    "stylers": [
+      {
+        "color": "#17263c"
+      }
+    ]
+  },
+  {
+    "featureType": "water",
+    "elementType": "labels.text.fill",
+    "stylers": [
+      {
+        "color": "#515c6d"
+      }
+    ]
+  },
+  {
+    "featureType": "water",
+    "elementType": "labels.text.stroke",
+    "stylers": [
+      {
+        "color": "#17263c"
+      }
+    ]
+  }
+]
 	});
 
 	var image = {
@@ -440,7 +601,8 @@ function updateTable(){
 			$element.css({backgroundColor: row.color});
 			shapeActive = row.draw();
 			neigMarkActive = row.drawNB();
-			drawBars(row.bedroomUnits);
+			//drawBars();
+			loadData(row.bedroomUnits);
 
 
 		},
@@ -491,7 +653,7 @@ function pointsPrice(communityD){
 			units without rooms do not have points
 			more points is best*/
 	}
-	return acumulate/communityD.numberUnits;
+	return acumulate; // /communityD.numberUnits;
 }
 function pointsIncome(communityD){
 	var acumulate = 0;
@@ -503,7 +665,7 @@ function pointsIncome(communityD){
 		more points is best
 		*/
 	}
-	return acumulate/communityD.numberUnits;
+	return acumulate ;///communityD.numberUnits;
 }
 function percentageByPreferences(){
 	var preferences = 0;
@@ -595,13 +757,13 @@ function sortByPreferences(){
 	updateTable();
 }
 
-
+var tooltip = d3.select("body").append("div").attr("class", "toolTip");
 
 
 function drawBars(values){
 
 var axiXSpace = 40;
-var svg = d3.select("#barChart");
+var svg = d3.select("#iu");
 var width = svg.attr("width");
 var height = svg.attr("height")  - axiXSpace;
 var sizeFont = 15;
@@ -625,15 +787,15 @@ y.domain([0, d3.max(values, function(d) { return d.value; })]);
       .attr("y", function(d) { return y(d.value); })
       .attr("width", x.bandwidth())
       .attr("height", function(d) { return height - y(d.value); })
-			.on("mousemove", function(d){
+
+			.on("mouseover", function(d){
 				 tooltip
 					 .style("left", d3.event.pageX - 50 + "px")
 					 .style("top" , d3.event.pageY - 70 + "px")
 					 .style("display", "inline-block")
 					 .html((d.text) + "<br>"  + (d.value));
 		 })
-		 .on("mouseout", function(d){ tooltip.style("display", "none")})
-		 .on("mouseover", function() { tooltip.style("display", null);});
+		 ;
 
 
   g.append("g").attr("class", "axis-x")
@@ -649,12 +811,126 @@ y.domain([0, d3.max(values, function(d) { return d.value; })]);
       .text(footerText);
 
 }
-
+d3.select("#grap")
+   .append("div")
+   .classed("svg-container", true) //container class to make it responsive
+   .append("svg")
+   //responsive SVG needs these 2 attributes and no width and height attr
+   .attr("preserveAspectRatio", "xMinYMin meet")
+   .attr("viewBox", "0 0 800 400")
+   //class to make it responsive
+   .classed("svg-content-responsive", true);
+/*
 var chart = $("#barChart"),
     aspect = chart.width()/chart.height(),
     container = chart.parent();
 $(window).on("resize", function() {
-    var targetWidth = container.width();
-    chart.attr("width", targetWidth);
-    chart.attr("height", Math.round(targetWidth / aspect));
+    var targetWidth = chart.parent();
+    chart.attr("width", container.width());
+    chart.attr("height", container.height());
 }).trigger("resize");
+*/
+/*BAR CHART */
+
+  // SETUP
+
+  var svg = d3.select("#barChart"),
+    margin = { top: 20, right: 20, bottom: 30, left: 40 },
+    x = d3.scaleBand().padding(0.1),
+    y = d3.scaleLinear(),
+    theData = undefined;
+
+  var g = svg.append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+  g.append("g")
+    .attr("class", "axis axis--x")
+
+
+  g.append("g")
+    .attr("class", "axis axis--y")
+		.style('fill', 'darkOrange');
+
+  g.append("text")
+    .attr("transform", "rotate(-90)")
+    .attr("y", 6)
+    .attr("dy", "0.71em")
+    .attr("text-anchor", "end")
+    .text("Frequency");
+
+  // DRAWING
+	var div = d3.select("body").append("div")
+	    .attr("class", "tooltip");
+  function paint() {
+
+    var bounds = svg.node().getBoundingClientRect(),
+      width = bounds.width - margin.left - margin.right,
+      height = bounds.height - margin.top - margin.bottom;
+
+    x.rangeRound([0, width]);
+    y.rangeRound([height, 0]);
+
+    g.select(".axis--x")
+      .attr("transform", "translate(0," + height + ")")
+      .call(d3.axisBottom(x));
+
+    g.select(".axis--y")
+      .call(d3.axisLeft(y));
+
+    var bars = g.selectAll(".bar")
+      .data(theData);
+
+    // ENTER
+    bars
+      .enter().append("rect")
+      .attr("class", "bar")
+      .attr("x", function (d) { return x(d.text); })
+      .attr("y", function (d) { return y(d.value); })
+      .attr("width", x.bandwidth())
+      .attr("height", function (d) { return height - y(d.value); })
+
+			.on("mouseover", function(d) {
+            div.transition()
+                .duration(50)
+                .style("opacity", 1);
+            div	.html(d.text + "<br/>"  + d.value)
+                .style("left", (d3.event.pageX) + "px")
+                .style("top", (d3.event.pageY - 28) + "px");
+            })
+        .on("mouseout", function(d) {
+            div.transition()
+                .duration(20)
+                .style("opacity", 0);
+        });
+			;
+
+    // UPDATE
+    bars.attr("x", function (d) { return x(d.text); })
+      .attr("y", function (d) { return y(d.value); })
+      .attr("width", x.bandwidth())
+      .attr("height", function (d) { return height - y(d.value); })
+			;
+
+    // EXIT
+    bars.exit()
+      .remove();
+
+  }
+
+  // LOADING DATA
+
+  function loadData(tsvFile) {
+			theData = tsvFile;
+
+			console.log(tsvFile)
+      x.domain(tsvFile.map(function (d) { return d.text; }))
+			;
+      y.domain([0, d3.max(theData, function (d) { return d.value; })]);
+
+      paint();
+
+  }
+
+  // START!
+
+
+  window.addEventListener("resize", paint);
