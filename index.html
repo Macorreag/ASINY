@@ -50,7 +50,7 @@
         </div>
         <div class="modal-body">
           The distance parameter takes a time when you can calculate the distances from all the cities within a district of the community and then give an average distance to the city, the average for which the data is ordered.
-The Load bar is on the right, this load should not take more than 30 seconds and it is only done once
+          The Load bar is on the right, this load should not take more than 30 seconds and it is only done once
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-primary" data-dismiss="modal" data-target="#myModal" >ok</button>
@@ -69,107 +69,99 @@ The Load bar is on the right, this load should not take more than 30 seconds and
   <div class="container-fluid">
     <div class="row justify-content-between">
       <div class="col-3 panel">
-        <p>Mira, se me ocurre que podrías hacerlo de esta manera: dentro de cada una de tus columnas metes una fila (row) y le dices que ocupen todo el espacio (col-md-12) y dentro de la fila donde quieres el espacio le añades un padding con la cantidad de separación que quieres, esto último te sugiero hacerlo mediante un media query en tu hoja de estilos ya que no vas a poder controlarlo mediante alguna clase especial para que se acomode todo correctamente en dispositivos móviles, prueba este código y te va quedar mas claro:</p>
-        <div class="col-md-10">
-          <div class="  margin-top-sm">
-            <div class="title"><strong>Ranking</strong></div>
-            <div class="table-responsive">
-              <table id="city"class="table">
-                <thead>
-                  <tr>
-                    <th>Position</th>
-                    <th>District</th>
-                    <th>BoroCD</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <th scope="row">1</th>
-                    <td>Mark</td>
-                    <td>Otto</td>
-                  </tr>
-                  <tr>
-                    <th scope="row">2</th>
-                    <td>Jacob</td>
-                    <td>Thornton</td>
-                  </tr>
-                  <tr>
-                    <th scope="row">3</th>
-                    <td>Larry</td>
-                    <td>the Bird</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-
-
-      </div>
-      <!-- Example split danger button -->
-      <div class="">
-        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-          <a class="navbar-brand"><strong>Preferences</strong></a>
-
-          <button class="navbar-toggler"  type="button" data-toggle="collapse" data-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-          </button>
-
-          <div class="collapse navbar-collapse" id="navbarNavDropdown">
-            <ul class="navbar-nav">
-              <li class="nav-item " >
-                <button id="distance" type="button" class="btn bg-dark text-light" onclick="sortByDistance()" >Distance</button>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link"   href="#">Security</a>
-              </li>
-              <li  class="nav-item">
-                <a class="nav-link" href="#">Pricing</a>
-              </li>
-              <li class="nav-item dropdown ">
-                <a class="nav-link dropdown-toggle"  id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                  Means of transport
-                </a>
-                <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-                  <a class="dropdown-item" href="#">Bike</a>
-                  <a class="dropdown-item" href="#">walking</a>
-                  <a class="dropdown-item" href="#">public transport</a>
+        <div class="col-md-12">
+          <div class="  margin-top-md">
+            <h2 id="Status">Ranking</h2>
+            <div class="row">
+              <div class="container">
+                <div class="progress">
+                  <div class="progress-bar  progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100" style="width: 0%">
+                    0% Loading
+                  </div>
                 </div>
-              </li>
-            </ul>
+              </div>
+            </div>
+            <div class="row">
+              <div class="table-responsive">
+                <div class="container">
+                  <table id="table"
+                  data-classes="table table-no-bordered"
+                  data-height="460">
+                  <thead>
+                    <tr>
+                      <th data-formatter="runningFormatter">Position</th>
+                      <th data-field="id">CD N°</th>
+                      <th data-field="borough">District</th>
+                    </tr>
+                  </thead>
+                </table>
+              </div>
+            </div>
           </div>
-        </nav>
+        </div>
       </div>
 
 
+    </div>
+    <!-- Example split danger button -->
+    <div class="">
+      <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <a class="navbar-brand "><strong>Preferences</strong></a>
 
-      <div class="col-3  panel">
-        <div class="row">
-          <div class="container">
-            <div class="col-sm-6"></div>
-            <div class="test col-sm-6"></div>
+        <button class="navbar-toggler"  type="button" data-toggle="collapse" data-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarNavDropdown">
+          <ul class="navbar-nav">
+            <li class="nav-item " >
+              <button id="distance" type="button" class="btn bg-dark text-light" onclick="calculateDistance()" >Distance</button>
+            </li>
+            <li class="nav-item">
+              <button id="price" type="button" class="btn bg-dark text-light" onclick="calculatePricing()" >Pricing</button>
+            </li>
+            <li  class="nav-item">
+              <a class="nav-link" href="#">Pricing</a>
+            </li>
+            <li class="nav-item dropdown ">
+              <a class="nav-link dropdown-toggle"  id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                Means of transport
+              </a>
+              <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                <a class="dropdown-item" href="#">Bike</a>
+                <a class="dropdown-item" href="#">walking</a>
+                <a class="dropdown-item" href="#">public transport</a>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </nav>
+    </div>
+
+
+
+    <div class="col-3  panel">
+      <svg id="barChart" width="1000" height="1000"
+      viewBox="0 0 450 650"
+      perserveAspectRatio="xMinYMid">
+      ></svg>
+      <div class="row">
+        <div class="container">
+
+        </div>
+        <div class="container">
+          <div class="col-sm-6"></div>
+          <!--<div class="test col-sm-6"></div>-->
+          <div class="row ">
+
 
           </div>
         </div>
+      </div>
 
 
-        <div class="  margin-top-sm">
-          <h4 id="Status">Loaded Data</h4>
-          <div class="progress">
-            <div class="progress-bar  progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100" style="width: 0%">
-              0% Loading
-            </div>
-          </div>
-          <table id="table"
-          data-classes="table table-no-bordered">
-          <thead>
-            <tr>
-              <th data-field="positionArray">Rank</th>
-              <th data-field="id">CD Number</th>
-              <th data-field="borough">District</th>
-            </tr>
-          </thead>
-        </table>
+      <div class="margin-top-sm">
+
       </div>
 
     </div>
