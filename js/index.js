@@ -13,7 +13,8 @@ features[i].properties.BoroCD  = 100 * BOROUGH + CD
 features[i].geometry.coordinates[j] = Coordinates of Shape
 */
 const HOUSEDATA = "https://data.cityofnewyork.us/api/views/hg8x-zxpr/rows.json?accessType=DOWNLOAD";
-
+/*Crimes filtered DataSets*/
+const CRIMES = "https://data.cityofnewyork.us/Public-Safety/Filtered12-31-2015Crimes/qcnt-82dk";
 const BOROUGH = ["Manhattan", "Bronx", "Brooklyn", "Queens", "Staten Island"];
 
 /*(Joint of Interest Areas) Not living posible Areas*/
@@ -31,6 +32,7 @@ var borough=[];
 /*Variables for GMaps*/
 var map;
 var shapeActive;
+var heatmap;
 /*ranking variables*/
 var maxDistance = 0;
 var preferenceDistance = false;
@@ -84,8 +86,34 @@ function neighborhoodToCD(neighborhood,numberBoro){
 		}
 	}
 }
+var crimeCoordinates = [];
+function getCrimes(){
+	$.ajax({
+	url: "https://data.cityofnewyork.us/resource/fj84-7huk.json",
+}).done(function(data) {
+		console.log(data)
+	//data = JSON.parse(data.responseText);
+		for (var i = 0; i < data.length; i++) {
+		crimeCoordinates.push(
+			new google.maps.LatLng(
+				data[i].latitude,
+				data[i].longitude
+				//responseJSON.features[i].geometry.coordinates[j][g][k][0]
+			)
+		);
 
 
+	}
+	console.log(crimeCoordinates);
+});
+
+heatmap = new google.maps.visualization.HeatmapLayer({
+				data: crimeCoordinates,
+				map: map
+});
+return crimeCoordinates;
+
+}
 function getDataShapeDistric(){
 	/*Organize DataSets of borough */
 	var geoCD = [[],[],[],[],[]];
@@ -326,6 +354,8 @@ function initMap() {
 ]
 	});
 
+
+
 	var image = {
 		url: 'https://i.imgur.com/QDsm8jB.png',
 		size: new google.maps.Size(45, 45),
@@ -385,7 +415,7 @@ class CommunityDistrict {
 			{"value":0 ,"text":"4"},
 			{"value":0 ,"text":"5"},
 			{"value":0 ,"text":"6"},
-			{"value":0 ,"text":"Undefined"}),
+			{"value":0 ,"text":"UD"}),
 		this._incomeUnits = new Array(
 			/*Level of IncomeUnits*/
 				{"value":0 ,"text":"Extremely low IncomeUnits"},
@@ -569,6 +599,7 @@ $("document").ready(function(){
 
 /*For bootstrap -Table*/
 function runningFormatter(value, row, index) {
+	/*Change Text by Icons */
 	if( index == 0 ){
 		return "Winner";
 	}
@@ -602,8 +633,11 @@ function updateTable(){
 			shapeActive = row.draw();
 			neigMarkActive = row.drawNB();
 			//drawBars();
+
 			loadData(row.bedroomUnits);
 
+			map.setCenter(row.neighborhoods[0].coorCenter);
+			map.setZoom(13);
 
 		},
 		//pageList:false,
@@ -844,17 +878,19 @@ $(window).on("resize", function() {
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
   g.append("g")
     .attr("class", "axis axis--x")
+		.style('fill', 'rgb(135, 137, 143)');
 
 
   g.append("g")
     .attr("class", "axis axis--y")
-		.style('fill', 'darkOrange');
+		.style('fill', 'rgb(135, 137, 143)');
 
   g.append("text")
     .attr("transform", "rotate(-90)")
     .attr("y", 6)
     .attr("dy", "0.71em")
     .attr("text-anchor", "end")
+		.style('fill', 'rgb(135, 137, 143)')
     .text("Frequency");
 
   // DRAWING
@@ -934,3 +970,6 @@ $(window).on("resize", function() {
 
 
   window.addEventListener("resize", paint);
+	function toggleHeatmap() {
+	        heatmap.setMap(heatmap.getMap() ? null : map);
+	      }

@@ -43,13 +43,12 @@ background-color: rgba(242, 117, 42,0.5);
 
 }
 .axis--x{
-stroke:blue;
+stroke:rgb(135, 137, 143);
 stroke-width: 0.5;
 }
 .axis--y{
-stroke:white;
+stroke:rgb(135, 137, 143);
 stroke-width: 0.5;
-color: green;
 }
 
 /*Bar chart personalization*/
