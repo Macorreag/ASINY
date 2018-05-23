@@ -42,6 +42,7 @@ var preferencePrice = false;
 /*Community District Sorted By distance between neighborhoods to NYU*/
 var filteredCD = [];
 
+
 /*
 Objects
 BOROUGH[
@@ -106,7 +107,6 @@ function getCrimes(callback){
 			);
 		}
 		document.getElementById("crimes").setAttribute('onclick','toggleHeatmap()')
-
 		callback();
 	});
 
@@ -389,7 +389,8 @@ class Neighborhood {
 	constructor(name,coorCenter,coordLimits) {
 		this._name = name;
 		this._coorCenter = coordinateGmaps(coorCenter);
-		this.distanceCar  = []
+		this.distanceCar  = [],
+		this._info
 	}
 	get name() {
 		return this._name;
@@ -398,13 +399,24 @@ class Neighborhood {
 		return this._coorCenter;
 	}
 	draw(){
-		var image = {
+		/*Icon To Neighborhood*/
+		const imageNB = {
 			url: 'https://i.imgur.com/PQwY47e.png?1',
 			size: new google.maps.Size(32, 32),
 			origin: new google.maps.Point(0, 0),
 			anchor: new google.maps.Point(15.5,15.5)
 		};
-		var marker = setMarker(image,this.coorCenter,this.name);
+		this._info = "Nombre:" + this._name + this.distanceCar[0];
+
+		var marker = setMarker(imageNB,this.coorCenter,this.name);
+		var infowindow = new google.maps.InfoWindow({
+			content:this._info,
+
+		});
+		marker.addListener('click', function () {
+			infowindow.open(map,marker);
+		});
+
 		return marker;
 	}
 }
@@ -820,8 +832,6 @@ class CommunityDistrict {
 			filteredCD.sort(calculatePoints);
 			updateTable();
 		}
-
-
 
 
 		/*Barchart init */
