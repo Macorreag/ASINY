@@ -18,7 +18,7 @@ const CRIMES = "https://data.cityofnewyork.us/Public-Safety/Filtered12-31-2015Cr
 const BOROUGH = ["Manhattan", "Bronx", "Brooklyn", "Queens", "Staten Island"];
 
 /*(Joint of Interest Areas) Not living posible Areas*/
-var colorJIA = "rgba(0, 0, 0, 0.9)";
+var colorJIA = "rgba(59, 255, 0, 1)";
 
 
 const coordUniversity = {	/*Position University*/
@@ -89,11 +89,13 @@ function neighborhoodToCD(neighborhood,numberBoro){
 	}
 }
 
- function getCrimes(){
+function returnArray(array){
+	return array;
+}
+function getCrimes(callback){
 	$.ajax({
 		url: "https://data.cityofnewyork.us/resource/fj84-7huk.json",
 	}).done(function(data){
-		console.log(data)
 		for (var i = 0; i < data.length; i++) {
 			crimeCoordinates.push(
 				new google.maps.LatLng(
@@ -102,19 +104,18 @@ function neighborhoodToCD(neighborhood,numberBoro){
 				)
 			);
 		}
-		heatmap = new google.maps.visualization.HeatmapLayer({
-			data: crimeCoordinates,
-			map: map
-		});
-
-
+		document.getElementById("crimes").setAttribute('onclick','toggleHeatmap()')
+		callback();
 	});
-
+	heatmap = new google.maps.visualization.HeatmapLayer({
+		data: returnArray(crimeCoordinates),
+		map: map
+	});
 
 	return crimeCoordinates;
 
 }
-function getDataShapeDistric(){
+function getDataShapeDistric(callback){
 	/*Organize DataSets of borough */
 	var geoCD = [[],[],[],[],[]];
 	var data = $.get(SHAPECD, () => {})
@@ -150,6 +151,7 @@ function getDataShapeDistric(){
 					}
 				}
 			}
+
 			communityDistrict = new CommunityDistrict(
 				responseJSON.features[i].properties.BoroCD,
 				subShape,
@@ -160,18 +162,22 @@ function getDataShapeDistric(){
 			/*SortByCommunityDistrict*/
 			if(communityDistrict.habitable){
 				filteredCD.push(communityDistrict);
+				communityDistrict.draw( "rgba(0, 0, 0, 0)" );
 			}else{
 				unlivableDistricts.push(communityDistrict);
-				communityDistrict.draw();
-				communityDistrict.infowindow("Zone: " + responseJSON.features[i].properties.BoroCD + " not habitable");
+				communityDistrict.draw(communityDistrict.color);
+				communityDistrict.infowindow("<h1>Zone:</h1> " + responseJSON.features[i].properties.BoroCD + " not habitable");
 			}
 			geoCD[numberBorough(responseJSON.features[i].properties.BoroCD)].push(communityDistrict);
 
 		}
+		;
+		callback();
 
 	}).fail(function (error) {
 		console.error(error);
 	})
+
 	return geoCD;
 }
 
@@ -434,7 +440,7 @@ class CommunityDistrict {
 				this.numberUnits = 0;
 				if((num-(numberBorough(num)+1)*100) < 26){
 					/*JIA is a different color for the user*/
-					this._color = randomColorRGBA(0.6); /*Problema colores muy similares*/
+					this._color = randomColorRGBA(0.9); /*Problema colores muy similares*/
 				}else{
 					this._color = colorJIA;
 
@@ -478,13 +484,13 @@ class CommunityDistrict {
 			get shape(){
 				return this._communityDistrShape;
 			}
-			draw(){
+			draw(fill){
 				this._communityDistrShape = new google.maps.Polygon({
 
 					paths: this._coordLimits,
 					strokeColor: this._color,
 					strokeWeight: 2,
-					fillColor: this._color,
+					fillColor: fill,
 					communityD:this
 				});
 				this._communityDistrShape.setMap(map);
@@ -618,8 +624,8 @@ class CommunityDistrict {
 
 		/*When Page charge Load Basic data */
 		$("document").ready(function(){
-			borough = getDataShapeDistric();
-			setTimeout(getDataNeighborhood,1000);
+			borough = getDataShapeDistric(getDataNeighborhood);
+			getCrimes(toggleHeatmap);
 		});
 
 		/*For bootstrap -Table*/
@@ -653,7 +659,7 @@ class CommunityDistrict {
 					};
 					console.log(row);
 					$element.css({backgroundColor: row.color});
-					shapeActive = row.draw();
+					shapeActive = row.draw(row.color);
 					neigMarkActive = row.drawNB();
 					$('#nameBoro').html(row.borough);
 					$('#numberCD').html("Community District : "+row.numberCD);
@@ -784,6 +790,7 @@ class CommunityDistrict {
 			$('#ModalDistance').modal('toggle');
 			$('#distance').addClass("btn-danger");
 			$('#distance').prop('disabled', true);
+			controlCharge(0);
 			await calculateDistances();
 			$('#distance').prop('disabled', false);
 			$('#distance').removeClass("btn-danger");
@@ -797,7 +804,9 @@ class CommunityDistrict {
 		async function calculatePricing(){
 			$('#price').addClass("btn-danger");
 			$('#price').prop('disabled', true);
+			controlCharge(10);
 			await getHousingData();
+			controlCharge(100);
 			$('#price').prop('disabled', false);
 			$('#price').removeClass("btn-danger");
 			document.getElementById("price").setAttribute('onclick','sortByPrice()');
