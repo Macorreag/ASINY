@@ -90,8 +90,8 @@
                   <thead>
                     <tr>
                       <th data-formatter="runningFormatter">Position</th>
-                      <th data-field="id">CD N°</th>
                       <th data-field="borough">District</th>
+                      <th data-field="numberCD">CD N°</th>
                     </tr>
                   </thead>
                 </table>
@@ -143,6 +143,8 @@
     <div class="col-3  panel">
       <br>
       <div class="container rounded margin-top">
+        <h2 id="nameBoro"></h2>
+        <h4 id="numberCD"></h4>
         <svg class="container rounded" id="barChart" width="100%" height="200px"></svg>
       </div>
 
@@ -152,9 +154,6 @@
   </div>
 </div>
 </div>
-
-
-
 
 <script type="text/javascript" src="js/index.js"></script>
 <!--Cargar la API de google maps de forma Asincrona*/-->

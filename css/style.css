@@ -6,19 +6,16 @@
     margin: 0;
     padding: 0;
 }
-
+/*Settings of  divs to show information*/
 .panel{
     background: linear-gradient(to right, rgba(0, 0, 0, 0.7 ) , rgba(34, 37, 42,0.8) );
     color: rgb(255, 255, 255);
     border: solid;
     border-color: black;
     padding: 0;
-    /*overflow: scroll;*/
 }
 .dropdown{
   color: white;
-  display: inline;
-
 }
 .navbar{
   color: white;
@@ -27,9 +24,7 @@
 tr:hover td {
 background-color: rgba(242, 117, 42,0.5);
 }
-#barChart{
-  background: rgba(45, 48, 53,0.5);
-}
+
 .test div{
   font-size:10px;
   background-color:green;
@@ -42,32 +37,17 @@ background-color: rgba(242, 117, 42,0.5);
 
 
 }
-.axis--x{
-stroke:rgb(135, 137, 143);
-stroke-width: 0.5;
-}
-.axis--y{
-stroke:rgb(135, 137, 143);
-stroke-width: 0.5;
-}
-
-/*Bar chart personalization*/
-div .tooltip {
-    position: absolute;
-    text-align: center;
-    width: 60px;
-    height: 28px;
-    padding: 2px;
-    font: 12px sans-serif;
-    background: green;
-    border: 0px;
-    border-radius: 8px;
-    pointer-events: none;
-}
 .container.custom-container {
       margin: 10px;
 }
 
+
+
+
+/*Style for barChart*/
+#barChart{
+  background: rgba(45, 48, 53,0.8);
+}
 .bar{
   fill: rgb(93, 40, 136);
 }
@@ -85,6 +65,42 @@ div .tooltip {
 	top: 0;
 	left: 0;
 }
-.axis{
-    color:  blue;
+#barChart text{
+  fill : white;
+}
+.axis--x .tick line{
+  stroke : white;
+  stroke-width  : 1;
+}
+.axis--x path{
+  stroke : white;
+  stroke-width  : 1;
+}
+.axis--x .tick text{
+  transform: rotate(90);
+}
+.axis--y .tick line{
+  stroke : white;
+  stroke-width  : 1;
+}
+.axis--y path{
+  stroke : white;
+  stroke-width  : 1;
+}
+/*Icons */
+
+.winner {
+    padding: 32px;
+    display: inline-block;
+    background-image:  url("https://i.imgur.com/IEayV2a.png");
+}
+.second {
+    padding: 32px;
+    display: inline-block;
+    background-image:  url("https://i.imgur.com/jOIBoeu.png");
+}
+.third {
+    padding: 32px;
+    display: inline-block;
+    background-image:  url("https://i.imgur.com/bEXVEfR.png");
 }

@@ -28,11 +28,12 @@ const coordUniversity = {	/*Position University*/
 /*JSON filtered */
 
 var borough=[];
-
+var crimeCoordinates = [];
 /*Variables for GMaps*/
 var map;
 var shapeActive;
 var heatmap;
+
 /*ranking variables*/
 var maxDistance = 0;
 var preferenceDistance = false;
@@ -86,32 +87,27 @@ function neighborhoodToCD(neighborhood,numberBoro){
 		}
 	}
 }
-var crimeCoordinates = [];
+
 function getCrimes(){
 	$.ajax({
-	url: "https://data.cityofnewyork.us/resource/fj84-7huk.json",
-}).done(function(data) {
+		url: "https://data.cityofnewyork.us/resource/fj84-7huk.json",
+	}).done(function(data){
 		console.log(data)
-	//data = JSON.parse(data.responseText);
 		for (var i = 0; i < data.length; i++) {
-		crimeCoordinates.push(
-			new google.maps.LatLng(
-				data[i].latitude,
-				data[i].longitude
-				//responseJSON.features[i].geometry.coordinates[j][g][k][0]
-			)
-		);
-
-
-	}
-	console.log(crimeCoordinates);
-});
-
-heatmap = new google.maps.visualization.HeatmapLayer({
-				data: crimeCoordinates,
-				map: map
-});
-return crimeCoordinates;
+			crimeCoordinates.push(
+				new google.maps.LatLng(
+					data[i].latitude,
+					data[i].longitude
+				)
+			);
+		}
+	});
+	heatmap = new google.maps.visualization.HeatmapLayer({
+		data: crimeCoordinates,
+		map: map
+	});
+	toggleHeatmap();
+	return crimeCoordinates;
 
 }
 function getDataShapeDistric(){
@@ -192,166 +188,166 @@ function initMap() {
 		zoom: 11,
 		/*29 levels to Zoom*/
 		styles:[
-  {
-    "elementType": "geometry",
-    "stylers": [
-      {
-        "color": "#242f3e"
-      }
-    ]
-  },
-  {
-    "elementType": "labels.text.fill",
-    "stylers": [
-      {
-        "color": "#746855"
-      }
-    ]
-  },
-  {
-    "elementType": "labels.text.stroke",
-    "stylers": [
-      {
-        "color": "#242f3e"
-      }
-    ]
-  },
-  {
-    "featureType": "administrative.locality",
-    "elementType": "labels.text.fill",
-    "stylers": [
-      {
-        "color": "#d59563"
-      }
-    ]
-  },
-  {
-    "featureType": "poi",
-    "elementType": "labels.text.fill",
-    "stylers": [
-      {
-        "color": "#d59563"
-      }
-    ]
-  },
-  {
-    "featureType": "poi.park",
-    "elementType": "geometry",
-    "stylers": [
-      {
-        "color": "#263c3f"
-      }
-    ]
-  },
-  {
-    "featureType": "poi.park",
-    "elementType": "labels.text.fill",
-    "stylers": [
-      {
-        "color": "#6b9a76"
-      }
-    ]
-  },
-  {
-    "featureType": "road",
-    "elementType": "geometry",
-    "stylers": [
-      {
-        "color": "#38414e"
-      }
-    ]
-  },
-  {
-    "featureType": "road",
-    "elementType": "geometry.stroke",
-    "stylers": [
-      {
-        "color": "#212a37"
-      }
-    ]
-  },
-  {
-    "featureType": "road",
-    "elementType": "labels.text.fill",
-    "stylers": [
-      {
-        "color": "#9ca5b3"
-      }
-    ]
-  },
-  {
-    "featureType": "road.highway",
-    "elementType": "geometry",
-    "stylers": [
-      {
-        "color": "#746855"
-      }
-    ]
-  },
-  {
-    "featureType": "road.highway",
-    "elementType": "geometry.stroke",
-    "stylers": [
-      {
-        "color": "#1f2835"
-      }
-    ]
-  },
-  {
-    "featureType": "road.highway",
-    "elementType": "labels.text.fill",
-    "stylers": [
-      {
-        "color": "#f3d19c"
-      }
-    ]
-  },
-  {
-    "featureType": "transit",
-    "elementType": "geometry",
-    "stylers": [
-      {
-        "color": "#2f3948"
-      }
-    ]
-  },
-  {
-    "featureType": "transit.station",
-    "elementType": "labels.text.fill",
-    "stylers": [
-      {
-        "color": "#d59563"
-      }
-    ]
-  },
-  {
-    "featureType": "water",
-    "elementType": "geometry",
-    "stylers": [
-      {
-        "color": "#17263c"
-      }
-    ]
-  },
-  {
-    "featureType": "water",
-    "elementType": "labels.text.fill",
-    "stylers": [
-      {
-        "color": "#515c6d"
-      }
-    ]
-  },
-  {
-    "featureType": "water",
-    "elementType": "labels.text.stroke",
-    "stylers": [
-      {
-        "color": "#17263c"
-      }
-    ]
-  }
-]
+			{
+				"elementType": "geometry",
+				"stylers": [
+					{
+						"color": "#242f3e"
+					}
+				]
+			},
+			{
+				"elementType": "labels.text.fill",
+				"stylers": [
+					{
+						"color": "#746855"
+					}
+				]
+			},
+			{
+				"elementType": "labels.text.stroke",
+				"stylers": [
+					{
+						"color": "#242f3e"
+					}
+				]
+			},
+			{
+				"featureType": "administrative.locality",
+				"elementType": "labels.text.fill",
+				"stylers": [
+					{
+						"color": "#d59563"
+					}
+				]
+			},
+			{
+				"featureType": "poi",
+				"elementType": "labels.text.fill",
+				"stylers": [
+					{
+						"color": "#d59563"
+					}
+				]
+			},
+			{
+				"featureType": "poi.park",
+				"elementType": "geometry",
+				"stylers": [
+					{
+						"color": "#263c3f"
+					}
+				]
+			},
+			{
+				"featureType": "poi.park",
+				"elementType": "labels.text.fill",
+				"stylers": [
+					{
+						"color": "#6b9a76"
+					}
+				]
+			},
+			{
+				"featureType": "road",
+				"elementType": "geometry",
+				"stylers": [
+					{
+						"color": "#38414e"
+					}
+				]
+			},
+			{
+				"featureType": "road",
+				"elementType": "geometry.stroke",
+				"stylers": [
+					{
+						"color": "#212a37"
+					}
+				]
+			},
+			{
+				"featureType": "road",
+				"elementType": "labels.text.fill",
+				"stylers": [
+					{
+						"color": "#9ca5b3"
+					}
+				]
+			},
+			{
+				"featureType": "road.highway",
+				"elementType": "geometry",
+				"stylers": [
+					{
+						"color": "#746855"
+					}
+				]
+			},
+			{
+				"featureType": "road.highway",
+				"elementType": "geometry.stroke",
+				"stylers": [
+					{
+						"color": "#1f2835"
+					}
+				]
+			},
+			{
+				"featureType": "road.highway",
+				"elementType": "labels.text.fill",
+				"stylers": [
+					{
+						"color": "#f3d19c"
+					}
+				]
+			},
+			{
+				"featureType": "transit",
+				"elementType": "geometry",
+				"stylers": [
+					{
+						"color": "#2f3948"
+					}
+				]
+			},
+			{
+				"featureType": "transit.station",
+				"elementType": "labels.text.fill",
+				"stylers": [
+					{
+						"color": "#d59563"
+					}
+				]
+			},
+			{
+				"featureType": "water",
+				"elementType": "geometry",
+				"stylers": [
+					{
+						"color": "#17263c"
+					}
+				]
+			},
+			{
+				"featureType": "water",
+				"elementType": "labels.text.fill",
+				"stylers": [
+					{
+						"color": "#515c6d"
+					}
+				]
+			},
+			{
+				"featureType": "water",
+				"elementType": "labels.text.stroke",
+				"stylers": [
+					{
+						"color": "#17263c"
+					}
+				]
+			}
+		]
 	});
 
 
@@ -416,171 +412,173 @@ class CommunityDistrict {
 			{"value":0 ,"text":"5"},
 			{"value":0 ,"text":"6"},
 			{"value":0 ,"text":"UD"}),
-		this._incomeUnits = new Array(
-			/*Level of IncomeUnits*/
-				{"value":0 ,"text":"Extremely low IncomeUnits"},
-				{"value":0 ,"text":"Very low IncomeUnits"},
-				{"value":0 ,"text":"Low IncomeUnits"},
-				{"value":0 ,"text":"Moderate low IncomeUnits"},
-				{"value":0 ,"text":"Middle IncomeUnits"},
-				{"value":0 ,"text":"Other IncomeUnits"});
-		this.affordableUnits = 0,
-		this.numberUnits = 0;
-		if((num-(numberBorough(num)+1)*100) < 26){
-			/*JIA is a different color for the user*/
-			this._color = randomColorRGBA(0.6); /*Problema colores muy similares*/
-		}else{
-			this._color = colorJIA;
+			this._incomeUnits = new Array(
+				/*Level of IncomeUnits*/
+				{"value":0 ,"text":"Extremely low"},
+				{"value":0 ,"text":"Very low "},
+				{"value":0 ,"text":"Low "},
+				{"value":0 ,"text":"Moderate low "},
+				{"value":0 ,"text":"Middle "},
+				{"value":0 ,"text":"Other "});
+				this.affordableUnits = 0,
+				this.numberUnits = 0;
+				if((num-(numberBorough(num)+1)*100) < 26){
+					/*JIA is a different color for the user*/
+					this._color = randomColorRGBA(0.6); /*Problema colores muy similares*/
+				}else{
+					this._color = colorJIA;
 
-		}
-	}
-	get id() {
-		return this._id;
-	}
-	get multiPolygon(){
-		return this._multiPolygon;
-	}
-
-	get neighborhoods(){
-		return this._neighborhoods;
-	}
-	get borough(){
-		return BOROUGH[numberBorough(this._id)];
-	}
-	get coordLimits(){
-		return this._coordLimits;
-	}
-	get habitable(){
-		if((this._id-(numberBorough(this._id)+1)*100) < 26){ /*Validate if is habitable*/
-			return true;
-		}else {
-			return false;
-		}
-	}
-	get color(){
-		return this._color;
-	}
-	get incomeUnits(){
-		return this._incomeUnits;
-	}
-	get bedroomUnits(){
-		return this._bedroomUnits;
-	}
-	draw(){
-		let communityDistr = new google.maps.Polygon({
-			paths: this._coordLimits,
-			strokeColor: this._color,
-			strokeWeight: 2,
-			fillColor: this._color
-		});
-		communityDistr.setMap(map);
-		return communityDistr;
-	}
-	drawNB(){
-		var neighborhoodMarkers = [];
-		for( var i = 0 ;i < this._neighborhoods.length ; i++){
-			neighborhoodMarkers.push(this._neighborhoods[i].draw());
-		}
-		return neighborhoodMarkers;
-	}
-
-}
-
-function getDataNeighborhood(){
-	/*Como parametro podria tener la URL */
-	var data = $.get(NAMESNEIGHBORHOOD,function(){})
-	.done(function(){
-		let responseJSON = JSON.parse(data.responseText);
-		for(var i = 0 ;i < data.responseJSON.data.length ;i++){
-			var neighborhood = new Neighborhood(
-				data.responseJSON.data[i][10],
-				data.responseJSON.data[i][9],
-				""
-			);
-			var numberB= BOROUGH.indexOf(data.responseJSON.data[i][16]);
-			neighborhoodToCD(neighborhood,numberB);
-
-		}
-	})
-	.fail(function(error){
-		console.log(error);
-	})
-}
-
-function getHousingData(){
-	/*Como parametro podria tener la URL */
-	var data = $.get(HOUSEDATA,function(){})
-	.done(function(){
-
-		var responseJSON = JSON.parse(data.responseText);
-
-		for(var i = 0 ;i < 	responseJSON.data.length ;i++){
-			let numberBoro = BOROUGH.indexOf(responseJSON.data[i][15]);
-			let numberCD = Number(responseJSON.data[i][19].slice(-2)); /*Extract last 2 items*/
-			var communityDistr = borough[numberBoro].filter(function( obj ) {
-				if(obj.id == ((numberBoro+1)*100)+numberCD){
-						return obj;
 				}
-			});
-			communityDistr[0].incomeUnits[0].value += Number(responseJSON.data[i][31]);
-			communityDistr[0].incomeUnits[1].value += Number(responseJSON.data[i][32]);
-			communityDistr[0].incomeUnits[2].value += Number(responseJSON.data[i][33]);
-			communityDistr[0].incomeUnits[3].value += Number(responseJSON.data[i][34]);
-			communityDistr[0].incomeUnits[4].value += Number(responseJSON.data[i][35]);
-			communityDistr[0].incomeUnits[5].value += Number(responseJSON.data[i][36]);
+			}
+			get id() {
+				return this._id;
+			}
+			get multiPolygon(){
+				return this._multiPolygon;
+			}
 
-			communityDistr[0].bedroomUnits[0].value += Number(responseJSON.data[i][37]);
-			communityDistr[0].bedroomUnits[1].value += Number(responseJSON.data[i][38]);
-			communityDistr[0].bedroomUnits[2].value += Number(responseJSON.data[i][39]);
-			communityDistr[0].bedroomUnits[3].value += Number(responseJSON.data[i][40]);
-			communityDistr[0].bedroomUnits[4].value += Number(responseJSON.data[i][41]);
-			communityDistr[0].bedroomUnits[5].value += Number(responseJSON.data[i][42]);
-			communityDistr[0].bedroomUnits[6].value += Number(responseJSON.data[i][43]);
-			communityDistr[0].bedroomUnits[7].value += Number(responseJSON.data[i][44]);
-
-			communityDistr[0].affordableUnits += Number(responseJSON.data[i][45]);
-			communityDistr[0].numberUnits += Number(responseJSON.data[i][47]);
-
-
+			get neighborhoods(){
+				return this._neighborhoods;
+			}
+			get borough(){
+				return BOROUGH[numberBorough(this._id)];
+			}
+			get coordLimits(){
+				return this._coordLimits;
+			}
+			get habitable(){
+				if((this._id-(numberBorough(this._id)+1)*100) < 26){ /*Validate if is habitable*/
+					return true;
+				}else {
+					return false;
+				}
+			}
+			get color(){
+				return this._color;
+			}
+			get incomeUnits(){
+				return this._incomeUnits;
+			}
+			get bedroomUnits(){
+				return this._bedroomUnits;
+			}
+			get numberCD(){
+				return this._id-((numberBorough(this._id)+1)*100);
+			}
+			draw(){
+				let communityDistr = new google.maps.Polygon({
+					paths: this._coordLimits,
+					strokeColor: this._color,
+					strokeWeight: 2,
+					fillColor: this._color
+				});
+				communityDistr.setMap(map);
+				return communityDistr;
+			}
+			drawNB(){
+				var neighborhoodMarkers = [];
+				for( var i = 0 ;i < this._neighborhoods.length ; i++){
+					neighborhoodMarkers.push(this._neighborhoods[i].draw());
+				}
+				return neighborhoodMarkers;
+			}
 		}
-})
-.fail(function(error){
-	console.error(error);
-})
-}
-function calculateDistanceCar( communityD ){
-	var distanceMatrixService = new google.maps.DistanceMatrixService;
-	var neighborhoodsDis = communityD.neighborhoods.map(a => a.coorCenter);
-	return new Promise(resolve => {
-		setTimeout(() => {
-			distanceMatrixService.getDistanceMatrix({
-				origins: neighborhoodsDis,
-				destinations: [coordUniversity],
-				unitSystem: google.maps.UnitSystem.METRIC,
-				travelMode: 'DRIVING'
+		function getDataNeighborhood(){
+			/*Como parametro podria tener la URL */
+			var data = $.get(NAMESNEIGHBORHOOD,function(){})
+			.done(function(){
+				let responseJSON = JSON.parse(data.responseText);
+				for(var i = 0 ;i < data.responseJSON.data.length ;i++){
+					var neighborhood = new Neighborhood(
+						data.responseJSON.data[i][10],
+						data.responseJSON.data[i][9],
+						""
+					);
+					var numberB= BOROUGH.indexOf(data.responseJSON.data[i][16]);
+					neighborhoodToCD(neighborhood,numberB);
 
-			},function(response, status){
-				if (status !== google.maps.DistanceMatrixStatus.OK) {
-					window.alert('Error Distance was: ' + status);
-				} else {
-					var sumDistance = 0;
-					var numberNeigh = communityD.neighborhoods.length;
-					for (var i = 0 ; i < numberNeigh ; i++){
-						communityD.neighborhoods[i].distanceCar.push(response.rows[i]);
-						sumDistance += response.rows[i].elements[0].distance.value;
-					}
-					/*Average cast to KM*/
-					var averageDistance = sumDistance/(1000*numberNeigh);
-					if(maxDistance < averageDistance){
-						/*Save max distance for calculate Number of points*/
-						maxDistance = averageDistance;
-					}
-					communityD.distanceCar = sumDistance/(1000*numberNeigh);
-					resolve('resolved');
 				}
 			})
-		}, 350);
-	})
+			.fail(function(error){
+				console.log(error);
+			})
+		}
+
+		function getHousingData(){
+			/*Como parametro podria tener la URL */
+			var data = $.get(HOUSEDATA,function(){})
+			.done(function(){
+
+				var responseJSON = JSON.parse(data.responseText);
+
+				for(var i = 0 ;i < 	responseJSON.data.length ;i++){
+					let numberBoro = BOROUGH.indexOf(responseJSON.data[i][15]);
+					let numberCD = Number(responseJSON.data[i][19].slice(-2)); /*Extract last 2 items*/
+					var communityDistr = borough[numberBoro].filter(function( obj ) {
+						if(obj.id == ((numberBoro+1)*100)+numberCD){
+							return obj;
+						}
+					});
+					communityDistr[0].incomeUnits[0].value += Number(responseJSON.data[i][31]);
+					communityDistr[0].incomeUnits[1].value += Number(responseJSON.data[i][32]);
+					communityDistr[0].incomeUnits[2].value += Number(responseJSON.data[i][33]);
+					communityDistr[0].incomeUnits[3].value += Number(responseJSON.data[i][34]);
+					communityDistr[0].incomeUnits[4].value += Number(responseJSON.data[i][35]);
+					communityDistr[0].incomeUnits[5].value += Number(responseJSON.data[i][36]);
+
+					communityDistr[0].bedroomUnits[0].value += Number(responseJSON.data[i][37]);
+					communityDistr[0].bedroomUnits[1].value += Number(responseJSON.data[i][38]);
+					communityDistr[0].bedroomUnits[2].value += Number(responseJSON.data[i][39]);
+					communityDistr[0].bedroomUnits[3].value += Number(responseJSON.data[i][40]);
+					communityDistr[0].bedroomUnits[4].value += Number(responseJSON.data[i][41]);
+					communityDistr[0].bedroomUnits[5].value += Number(responseJSON.data[i][42]);
+					communityDistr[0].bedroomUnits[6].value += Number(responseJSON.data[i][43]);
+					communityDistr[0].bedroomUnits[7].value += Number(responseJSON.data[i][44]);
+
+					communityDistr[0].affordableUnits += Number(responseJSON.data[i][45]);
+					communityDistr[0].numberUnits += Number(responseJSON.data[i][47]);
+
+
+				}
+			})
+			.fail(function(error){
+				console.error(error);
+			});
+		}
+
+		function calculateDistanceCar( communityD ){
+			var distanceMatrixService = new google.maps.DistanceMatrixService;
+			var neighborhoodsDis = communityD.neighborhoods.map(a => a.coorCenter);
+			return new Promise(resolve => {
+				setTimeout(() => {
+					distanceMatrixService.getDistanceMatrix({
+						origins: neighborhoodsDis,
+						destinations: [coordUniversity],
+						unitSystem: google.maps.UnitSystem.METRIC,
+						travelMode: 'DRIVING'
+
+					},function(response, status){
+						if (status !== google.maps.DistanceMatrixStatus.OK) {
+							window.alert('Error Distance was: ' + status);
+						} else {
+							var sumDistance = 0;
+							var numberNeigh = communityD.neighborhoods.length;
+							for (var i = 0 ; i < numberNeigh ; i++){
+								communityD.neighborhoods[i].distanceCar.push(response.rows[i]);
+								sumDistance += response.rows[i].elements[0].distance.value;
+							}
+							/*Average cast to KM*/
+							var averageDistance = sumDistance/(1000*numberNeigh);
+							if(maxDistance < averageDistance){
+								/*Save max distance for calculate Number of points*/
+								maxDistance = averageDistance;
+							}
+							communityD.distanceCar = sumDistance/(1000*numberNeigh);
+							resolve('resolved');
+						}
+					})
+				}, 350);
+			})
 }
 
 function compareById(a,b) {
@@ -601,24 +599,22 @@ $("document").ready(function(){
 function runningFormatter(value, row, index) {
 	/*Change Text by Icons */
 	if( index == 0 ){
-		return "Winner";
+		return '<span class="winner "></span>';
 	}
 	if( index == 1 ){
-		return "Second";
+		return '<span class="second "></span>';
 	}
 	if( index == 2 ){
-		return "Third";
+		return '<span class="third "></span>';
 	}
-    return index + 1;
+	return '<div class="text-center"><strong align="center" style="margin:auto">'+ (index + 1)+'</strong></div>';
 }
 /*/Clean Code/Clean Code/Clean Code/Clean Code/Clean Code/Clean Code/Clean Code/Clean Code*/
 
 
 
-
+/*SORT BY ACTIVE PARAMETERS*/
 function updateTable(){
-
-	/*SORT BY ACTIVE PARAMETERS*/
 	$('#table').bootstrapTable({
 		data:filteredCD,
 		onClickRow: function (row,$element){
@@ -632,10 +628,11 @@ function updateTable(){
 			$element.css({backgroundColor: row.color});
 			shapeActive = row.draw();
 			neigMarkActive = row.drawNB();
-			//drawBars();
+			$('#nameBoro').html(row.borough);
+			$('#numberCD').html("Community District : "+row.numberCD);
 
-			loadData(row.bedroomUnits);
 
+			drawChart(row.incomeUnits);
 			map.setCenter(row.neighborhoods[0].coorCenter);
 			map.setZoom(13);
 
@@ -656,11 +653,6 @@ function updateTable(){
 }
 /*FOR TEST
 */
-
-
-
-
-
 async function calculateDistances(){
 	for(var i = 0;i < borough.length ;i++ ){
 		for (var j = 0;j <borough[i].length ;j++){
@@ -678,14 +670,16 @@ function compareByDistances(a,b) {
 	return 1;
 	return 0;
 }
+
+/*Funtions To calculate The Best District*/
 function pointsPrice(communityD){
 	var acumulate = 0;
 	for(var i = 1;i < 8; i++){
 		/*priorize number of bedroom per unit*/
-			acumulate += (communityD.bedroomUnits[i].value*i);
-			/*priorize by i more bredrom more points
-			units without rooms do not have points
-			more points is best*/
+		acumulate += (communityD.bedroomUnits[i].value*i);
+		/*priorize by i more bredrom more points
+		units without rooms do not have points
+		more points is best*/
 	}
 	return acumulate; // /communityD.numberUnits;
 }
@@ -693,7 +687,7 @@ function pointsIncome(communityD){
 	var acumulate = 0;
 	for(var i = 1, priorize = 5;i < 5; i++,priorize--){
 		/*priorize number of bedroom per unit*/
-			acumulate += (communityD.incomeUnits[i].value*priorize);
+		acumulate += (communityD.incomeUnits[i].value*priorize);
 		/*priorize units by incomeUnits
 		Units with unknown income values are not counted
 		more points is best
@@ -734,7 +728,7 @@ function calculatePoints(a,b) {
 	return 1;
 	return 0;
 }
-
+/*Funtion to show user loading Data*/
 function controlCharge(status){
 	$('.progress-bar').text( status+"% Loading" );
 	$('.progress-bar').css( "width",status+"%" );
@@ -748,7 +742,17 @@ function controlCharge(status){
 		$('.progress-bar').removeClass("bg-success");
 	}
 }
-
+/*State of buttons*/
+function pressButton( button ){
+	if( button.hasClass("btn-primary") ){
+		button.removeClass("btn-primary");
+		return false;
+	}else{
+		button.addClass("btn-primary");
+		return true;
+	}
+}
+/*Start Sorting of best CD*/
 async function calculateDistance(){
 	$('#ModalDistance').modal('toggle');
 	$('#distance').addClass("btn-danger");
@@ -764,7 +768,6 @@ function sortByDistance(){
 	sortByPreferences();
 }
 async function calculatePricing(){
-	//$('#ModalDistance').modal('toggle');
 	$('#price').addClass("btn-danger");
 	$('#price').prop('disabled', true);
 	await getHousingData();
@@ -777,199 +780,85 @@ function sortByPrice(){
 	preferencePrice = pressButton($('#price'));
 	sortByPreferences();
 }
-function pressButton( button ){
-	if( button.hasClass("btn-primary") ){
-		button.removeClass("btn-primary");
-		return false;
-	}else{
-		button.addClass("btn-primary");
-		return true;
-	}
-}
+
 function sortByPreferences(){
 	filteredCD.sort(calculatePoints);
 	updateTable();
 }
 
-var tooltip = d3.select("body").append("div").attr("class", "toolTip");
 
 
-function drawBars(values){
 
-var axiXSpace = 40;
-var svg = d3.select("#iu");
-var width = svg.attr("width");
-var height = svg.attr("height")  - axiXSpace;
-var sizeFont = 15;
+/*Barchart init */
+var svg = d3.select("#barChart"),
+margin = { top: 30, right: 20, bottom: 30, left: 40 },
+x = d3.scaleBand().padding(0.3),
+y = d3.scaleLinear(),
+theData = undefined;
 
-var footerText = "Number of bedroom by units";
+var g = svg.append("g")
+.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+/*make axis for chart*/
+g.append("g")
+.attr("class", "axis axis--x");
 
-var x = d3.scaleBand().rangeRound([0, width]).padding(0.05);
-var y = d3.scaleLinear().rangeRound([height, 0]);
+g.append("g")
+.attr("class", "axis axis--y");
 
-var g = svg.append("g");
-var tooltip = d3.select("body").append("div").attr("class", "toolTip");
+g.append("text")
+.attr("transform", "translate(0,-10)")
+.text("Houses according to cost");
 
-x.domain(values.map(function(d) { return d.text; }));
-y.domain([0, d3.max(values, function(d) { return d.value; })]);
+/*Barchart responsive listener*/
+window.addEventListener("resize", paint);
 
- g.selectAll(".bar")
-    .data(values)
-    .enter().append("rect")
-      .attr("class", "bar")
-      .attr("x", function(d) { return x(d.text); })
-      .attr("y", function(d) { return y(d.value); })
-      .attr("width", x.bandwidth())
-      .attr("height", function(d) { return height - y(d.value); })
-
-			.on("mouseover", function(d){
-				 tooltip
-					 .style("left", d3.event.pageX - 50 + "px")
-					 .style("top" , d3.event.pageY - 70 + "px")
-					 .style("display", "inline-block")
-					 .html((d.text) + "<br>"  + (d.value));
-		 })
-		 ;
-
-
-  g.append("g").attr("class", "axis-x")
-      .attr("transform", "translate(0,"+ (height + 1) + ")")
-      .call(d3.axisBottom(x));
-
-  svg.append("text")
-      .attr("transform",
-            "translate(" + (width/2) + " ," +
-                           ((height )+ sizeFont + 20) + ")")
-			.style("font-size",sizeFont + "px")
-      .style("text-anchor", "middle")
-      .text(footerText);
-
+/*Function to update data display in barChart*/
+function drawChart(tsvFile) {
+	theData = tsvFile;
+	console.log(tsvFile)
+	x.domain(tsvFile.map(function (d) { return d.text; }));
+	y.domain([0, d3.max(theData, function (d) { return d.value; })]);
+	paint();
 }
-d3.select("#grap")
-   .append("div")
-   .classed("svg-container", true) //container class to make it responsive
-   .append("svg")
-   //responsive SVG needs these 2 attributes and no width and height attr
-   .attr("preserveAspectRatio", "xMinYMin meet")
-   .attr("viewBox", "0 0 800 400")
-   //class to make it responsive
-   .classed("svg-content-responsive", true);
-/*
-var chart = $("#barChart"),
-    aspect = chart.width()/chart.height(),
-    container = chart.parent();
-$(window).on("resize", function() {
-    var targetWidth = chart.parent();
-    chart.attr("width", container.width());
-    chart.attr("height", container.height());
-}).trigger("resize");
-*/
-/*BAR CHART */
+/*Config Draw of Chart*/
+function paint() {
+	var bounds = svg.node().getBoundingClientRect(),
+	width = bounds.width - margin.left - margin.right,
+	height = bounds.height - margin.top - margin.bottom ;
+	/*When resize recalculate limits|*/
+	x.rangeRound([0, width]);
+	y.rangeRound([height, 0]);
 
-  // SETUP
+	g.select(".axis--x")
+	.attr("transform", "translate(0," + height + ")")
+	.call(d3.axisBottom(x))
+	.selectAll("text")
+	.attr("transform", "rotate(-15)");
 
-  var svg = d3.select("#barChart"),
-    margin = { top: 20, right: 20, bottom: 30, left: 40 },
-    x = d3.scaleBand().padding(0.1),
-    y = d3.scaleLinear(),
-    theData = undefined;
+	g.select(".axis--y")
+	.call(d3.axisLeft(y));
 
-  var g = svg.append("g")
-    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-  g.append("g")
-    .attr("class", "axis axis--x")
-		.style('fill', 'rgb(135, 137, 143)');
+	var bars = g.selectAll(".bar")
+	.data(theData);
 
+	/*Draw bars with exact size*/
+	bars.enter().append("rect")
+	.attr("class", "bar")
+	.attr("x", function (d) { return x(d.text); })
+	.attr("y", function (d) { return y(d.value); })
+	.attr("width", x.bandwidth())
+	.attr("height", function (d) { return height - y(d.value); });
+	/*Insert New Data*/
+	bars.attr("x", function (d) { return x(d.text); })
+	.attr("y", function (d) { return y(d.value); })
+	.attr("width", x.bandwidth())
+	.attr("height", function (d) { return height - y(d.value); });
 
-  g.append("g")
-    .attr("class", "axis axis--y")
-		.style('fill', 'rgb(135, 137, 143)');
+	bars.exit().remove();
+}
+/*barChart end*/
 
-  g.append("text")
-    .attr("transform", "rotate(-90)")
-    .attr("y", 6)
-    .attr("dy", "0.71em")
-    .attr("text-anchor", "end")
-		.style('fill', 'rgb(135, 137, 143)')
-    .text("Frequency");
-
-  // DRAWING
-	var div = d3.select("body").append("div")
-	    .attr("class", "tooltip");
-  function paint() {
-
-    var bounds = svg.node().getBoundingClientRect(),
-      width = bounds.width - margin.left - margin.right,
-      height = bounds.height - margin.top - margin.bottom;
-
-    x.rangeRound([0, width]);
-    y.rangeRound([height, 0]);
-
-    g.select(".axis--x")
-      .attr("transform", "translate(0," + height + ")")
-      .call(d3.axisBottom(x));
-
-    g.select(".axis--y")
-      .call(d3.axisLeft(y));
-
-    var bars = g.selectAll(".bar")
-      .data(theData);
-
-    // ENTER
-    bars
-      .enter().append("rect")
-      .attr("class", "bar")
-      .attr("x", function (d) { return x(d.text); })
-      .attr("y", function (d) { return y(d.value); })
-      .attr("width", x.bandwidth())
-      .attr("height", function (d) { return height - y(d.value); })
-
-			.on("mouseover", function(d) {
-            div.transition()
-                .duration(50)
-                .style("opacity", 1);
-            div	.html(d.text + "<br/>"  + d.value)
-                .style("left", (d3.event.pageX) + "px")
-                .style("top", (d3.event.pageY - 28) + "px");
-            })
-        .on("mouseout", function(d) {
-            div.transition()
-                .duration(20)
-                .style("opacity", 0);
-        });
-			;
-
-    // UPDATE
-    bars.attr("x", function (d) { return x(d.text); })
-      .attr("y", function (d) { return y(d.value); })
-      .attr("width", x.bandwidth())
-      .attr("height", function (d) { return height - y(d.value); })
-			;
-
-    // EXIT
-    bars.exit()
-      .remove();
-
-  }
-
-  // LOADING DATA
-
-  function loadData(tsvFile) {
-			theData = tsvFile;
-
-			console.log(tsvFile)
-      x.domain(tsvFile.map(function (d) { return d.text; }))
-			;
-      y.domain([0, d3.max(theData, function (d) { return d.value; })]);
-
-      paint();
-
-  }
-
-  // START!
-
-
-  window.addEventListener("resize", paint);
-	function toggleHeatmap() {
-	        heatmap.setMap(heatmap.getMap() ? null : map);
-	      }
+/*Control heatmap*/
+function toggleHeatmap() {
+	heatmap.setMap(heatmap.getMap() ? null : map);
+}
