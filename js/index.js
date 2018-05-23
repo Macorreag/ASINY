@@ -89,10 +89,11 @@ function neighborhoodToCD(neighborhood,numberBoro){
 	}
 }
 
-function returnArray(array){
-	return array;
-}
 function getCrimes(callback){
+	heatmap = new google.maps.visualization.HeatmapLayer({
+		data: crimeCoordinates,
+		map: map
+	});
 	$.ajax({
 		url: "https://data.cityofnewyork.us/resource/fj84-7huk.json",
 	}).done(function(data){
@@ -105,12 +106,10 @@ function getCrimes(callback){
 			);
 		}
 		document.getElementById("crimes").setAttribute('onclick','toggleHeatmap()')
+
 		callback();
 	});
-	heatmap = new google.maps.visualization.HeatmapLayer({
-		data: returnArray(crimeCoordinates),
-		map: map
-	});
+
 
 	return crimeCoordinates;
 
