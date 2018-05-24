@@ -59,6 +59,26 @@
       </div>
     </div>
   </div>
+  <div class="modal fade" id="ModalWelcome" tabindex="-1" role="dialog"  aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLongTitle">Welcome to Asiny</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          Select the filters in the central bar, then click on the bar below the district you want to analyze.
+          There are also tools in the same bar in the middle so you can make your decision you only need to select them or deselect them if you want to hide them.
+  </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary" data-dismiss="modal" data-target="#ModalWelcome" >ok</button>
+          <!--<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>-->
+        </div>
+      </div>
+    </div>
+  </div>
 
 
   <!--Espacido en bootstrap offset-md-4 deja el espaciado en el container respecto a la grilla -->
@@ -69,8 +89,14 @@
   <div class="container-fluid">
     <div class="row justify-content-between">
       <div class="col-3 panel">
+
         <div class="col-md-12">
           <div class="  margin-top-md">
+            <div class="container">
+              <h1>Asiny</h1>
+              <h3>Site In New York</h3>
+              <h6>A page to find the best district to live according to your preferences.</h6>
+            </div>
             <h2 id="Status">Ranking</h2>
             <div class="row">
               <div class="container">
@@ -105,35 +131,40 @@
     </div>
     <!-- Example split danger button -->
     <div class="">
-      <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <a class="navbar-brand "><strong>Preferences</strong></a>
+      <nav class="navbar navbar-expand-lg navbar-dark bg-primary rounded-bottom">
+        <a class="navbar-brand "><strong>Filters</strong></a>
 
         <button class="navbar-toggler"  type="button" data-toggle="collapse" data-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
         </button>
 
-        <div class="collapse navbar-collapse" id="navbarNavDropdown">
-          <ul class="navbar-nav">
-            <li class="nav-item " >
-              <button id="distance" type="button" class="btn bg-dark text-light" onclick="calculateDistance()" >Distance</button>
-            </li>
-            <li class="nav-item">
-              <button id="price" type="button" class="btn bg-dark text-light" onclick="calculatePricing()" >Pricing</button>
-            </li>
-            <li  class="nav-item">
-              <a class="nav-link" href="#">Pricing</a>
-            </li>
-            <li class="nav-item dropdown ">
-              <a class="nav-link dropdown-toggle"  id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                Means of transport
-              </a>
-              <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-                <a id="crimes" class="dropdown-item" onclick="toggleHeatmap()">Heat Map Crimes</a>
-                <a class="dropdown-item" href="#">walking</a>
-                <a class="dropdown-item" href="#">public transport</a>
-              </div>
-            </li>
-          </ul>
+        <div class="collapse navbar-collapse margin-sm" id="navbarNavDropdown">
+          <br>
+          <br>
+          <div class="container">
+            <ul class="navbar-nav">
+              <button id="distance" type="button" class="btn-primary text-light p-md" onclick="calculateDistance()" >Distance</button>
+              <button id="price" type="button" class="btn-primary text-light" onclick="calculatePricing()" >Pricing</button>
+              <li class="" >
+              </li>
+              <li class="nav-item">
+              </li>
+              <!-- <li  class="nav-item">
+                <a class="nav-link" href="#">Pricing</a>
+              </li> -->
+              <li class="nav-item dropdown ">
+                <a class="nav-link dropdown-toggle"  id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                  Decision tools
+                </a>
+                <div class="dropdown-menu bg-primary" aria-labelledby="navbarDropdownMenuLink">
+                  <button id="crimes" type="button" class="btn-outline-primary btn-block text-light  p-md" onclick="toggleHeatmap()" >Show Crimes</button>
+                  <a class="dropdown-item" href="#">walking</a>
+                  <a class="dropdown-item" href="#">public transport</a>
+                </div>
+              </li>
+            </ul>
+          </div>
+
         </div>
       </nav>
     </div>
@@ -146,18 +177,20 @@
         <h2 id="nameBoro"></h2>
         <h4 id="numberCD"></h4>
         <svg class="container rounded" id="barChart" width="100%" height="200px"></svg>
+        <br>
+        <strong id="distanceAverage">Distance Variable</strong>
       </div>
 
 
 
 
+    </div>
   </div>
-</div>
 </div>
 
 <script type="text/javascript" src="js/index.js"></script>
 <!--Cargar la API de google maps de forma Asincrona*/-->
-<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCcVSzMvDoSRvr9RUUIjrLLJ1HjTrUBKcg&v=3&libraries=geometry,visualization&callback=initMap">
+<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCcVSzMvDoSRvr9RUUIjrLLJ1HjTrUBKcg&v=3&libraries=geometry,visualization&callback=initMap&language=en">
 </script>
 <!--Cargamos de ultimas el javascript para no interrumpir la carga de la pagina-->
 

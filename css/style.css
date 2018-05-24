@@ -21,8 +21,9 @@
   color: white;
 }
 
+
 tr:hover td {
-background-color: rgba(242, 117, 42,0.5);
+background-color: rgba(0, 0, 0,0.5);
 }
 
 .test div{
@@ -103,4 +104,12 @@ background-color: rgba(242, 117, 42,0.5);
     padding: 32px;
     display: inline-block;
     background-image:  url("https://i.imgur.com/bEXVEfR.png");
+}
+/*Configuration InfoWindow in map */
+.infoNeigh{
+
+}
+/*InfoWindow no habitable shape*/
+.infoIna{
+
 }

@@ -91,10 +91,7 @@ function neighborhoodToCD(neighborhood,numberBoro){
 }
 
 function getCrimes(callback){
-	heatmap = new google.maps.visualization.HeatmapLayer({
-		data: crimeCoordinates,
-		map: map
-	});
+
 	$.ajax({
 		url: "https://data.cityofnewyork.us/resource/fj84-7huk.json",
 	}).done(function(data){
@@ -165,7 +162,7 @@ function getDataShapeDistric(callback){
 			}else{
 				unlivableDistricts.push(communityDistrict);
 				communityDistrict.draw(communityDistrict.color);
-				communityDistrict.infowindow("<h1>Zone:</h1> " + responseJSON.features[i].properties.BoroCD + " not habitable");
+				communityDistrict.infowindow("<div class=\"infoIna\"><h5> CommunityDistrict:"+responseJSON.features[i].properties.BoroCD+"</h5>No habitable </div>");
 			}
 			geoCD[numberBorough(responseJSON.features[i].properties.BoroCD)].push(communityDistrict);
 
@@ -200,6 +197,9 @@ function initMap() {
 	map = new google.maps.Map(document.getElementById('map'), {
 		center: coordUniversity,
 		zoom: 11,
+		zoomControl : false,
+		fullscreenControl: false,
+		mapTypeControl:false,
 		/*29 levels to Zoom*/
 		styles:[
 			{
@@ -364,6 +364,11 @@ function initMap() {
 		]
 	});
 
+	var centerControlDiv = document.createElement('div');
+	var centerControl = new CenterControl(centerControlDiv, map);
+
+	centerControlDiv.index = 1;
+	map.controls[google.maps.ControlPosition.BOTTOM_CENTER].push(centerControlDiv);
 
 
 	var image = {
@@ -374,6 +379,10 @@ function initMap() {
 	};
 
 	setMarker(image,coordUniversity,'NYC University');
+	heatmap = new google.maps.visualization.HeatmapLayer({
+		data: crimeCoordinates,
+		map: map
+	});
 }
 
 function pointInPath( point , coordLimits){
@@ -406,15 +415,18 @@ class Neighborhood {
 			origin: new google.maps.Point(0, 0),
 			anchor: new google.maps.Point(15.5,15.5)
 		};
-		this._info = "Nombre:" + this._name + this.distanceCar[0];
+		this._info = "<div class=\"infoNeigh\"><h5>"+this._name+"</h5>Neighborhood</div>";
 
 		var marker = setMarker(imageNB,this.coorCenter,this.name);
 		var infowindow = new google.maps.InfoWindow({
 			content:this._info,
 
 		});
-		marker.addListener('click', function () {
+		marker.addListener('mouseover', function () {
 			infowindow.open(map,marker);
+		});
+		marker.addListener('mouseout', function () {
+			infowindow.close();
 		});
 
 		return marker;
@@ -508,15 +520,15 @@ class CommunityDistrict {
 				return this._communityDistrShape;
 			}
 			infowindow(text){
-					var infowindow = new google.maps.InfoWindow();
-					google.maps.event.addListener(this._communityDistrShape, 'mouseover', function (event) {
-						infowindow.setContent(text);
-						infowindow.setPosition(this.getPath().getAt(0));
-						infowindow.open(map);
-					});
-					google.maps.event.addListener(this._communityDistrShape, 'mouseout', function (event) {
-						infowindow.close();
-					});
+				var infowindow = new google.maps.InfoWindow();
+				google.maps.event.addListener(this._communityDistrShape, 'mouseover', function (event) {
+					infowindow.setContent(text);
+					infowindow.setPosition(this.getPath().getAt(0));
+					infowindow.open(map);
+				});
+				google.maps.event.addListener(this._communityDistrShape, 'mouseout', function (event) {
+					infowindow.close();
+				});
 			}
 
 			drawNB(){
@@ -637,6 +649,7 @@ class CommunityDistrict {
 		$("document").ready(function(){
 			borough = getDataShapeDistric(getDataNeighborhood);
 			getCrimes(toggleHeatmap);
+			$('#ModalWelcome').modal('show');
 		});
 
 		/*For bootstrap -Table*/
@@ -677,6 +690,9 @@ class CommunityDistrict {
 
 
 					drawChart(row.incomeUnits);
+					if(row.distanceCar != 'undefined'){
+						$('#distanceAverage').html("Average distance in car: "+row.distanceCar.toFixed(2) + "Km");
+					}
 					map.setCenter(row.neighborhoods[0].coorCenter);
 					map.setZoom(13);
 
@@ -725,7 +741,7 @@ class CommunityDistrict {
 				units without rooms do not have points
 				more points is best*/
 			}
-			return acumulate; // /communityD.numberUnits;
+			return acumulate/communityD.numberUnits;
 		}
 		function pointsIncome(communityD){
 			var acumulate = 0;
@@ -737,7 +753,7 @@ class CommunityDistrict {
 				more points is best
 				*/
 			}
-			return acumulate ;///communityD.numberUnits;
+			return acumulate/communityD.numberUnits;
 		}
 		function percentageByPreferences(){
 			var preferences = 0;
@@ -756,8 +772,8 @@ class CommunityDistrict {
 				/*Function of points priorize
 				*Number of bedroomUnits
 				*/
-				scoreA -= (pointsIncome(a) + pointsPrice(a));
-				scoreB -= (pointsIncome(b) + pointsPrice(b));
+				scoreA += (pointsIncome(a) + pointsPrice(a));
+				scoreB += (pointsIncome(b) + pointsPrice(b));
 				scoreA = scoreA*percentageByPreferences();
 				scoreB = scoreB*percentageByPreferences();
 			}
@@ -788,23 +804,23 @@ class CommunityDistrict {
 		}
 		/*State of buttons*/
 		function pressButton( button ){
-			if( button.hasClass("btn-primary") ){
-				button.removeClass("btn-primary");
+			if( button.hasClass("btn-success") ){
+				button.removeClass("btn-success");
 				return false;
 			}else{
-				button.addClass("btn-primary");
+				button.addClass("btn-success");
 				return true;
 			}
 		}
 		/*Start Sorting of best CD*/
 		async function calculateDistance(){
 			$('#ModalDistance').modal('toggle');
-			$('#distance').addClass("btn-danger");
+			$('#distance').addClass("btn-warning");
 			$('#distance').prop('disabled', true);
 			controlCharge(0);
 			await calculateDistances();
 			$('#distance').prop('disabled', false);
-			$('#distance').removeClass("btn-danger");
+			$('#distance').removeClass("btn-warning");
 			document.getElementById("distance").setAttribute('onclick','sortByDistance()')
 			sortByDistance();
 		}
@@ -813,13 +829,13 @@ class CommunityDistrict {
 			sortByPreferences();
 		}
 		async function calculatePricing(){
-			$('#price').addClass("btn-danger");
+			$('#price').addClass("btn-warning");
 			$('#price').prop('disabled', true);
 			controlCharge(10);
 			await getHousingData();
 			controlCharge(100);
 			$('#price').prop('disabled', false);
-			$('#price').removeClass("btn-danger");
+			$('#price').removeClass("btn-warning");
 			document.getElementById("price").setAttribute('onclick','sortByPrice()');
 			sortByPrice();
 		}
@@ -854,6 +870,13 @@ class CommunityDistrict {
 		.attr("transform", "translate(0,-10)")
 		.text("Houses according to cost");
 
+		  g.append("text")
+				.attr("transform", "translate(200,0)")
+				.attr("transform", "rotate(-90)")
+		    .attr("y", 6)
+		    .attr("dy", "0.71em")
+		    .attr("text-anchor", "end")
+		    .text("Frequency");
 		/*Barchart responsive listener*/
 		window.addEventListener("resize", paint);
 
@@ -906,4 +929,38 @@ class CommunityDistrict {
 		/*Control heatmap*/
 		function toggleHeatmap() {
 			heatmap.setMap(heatmap.getMap() ? null : map);
+		}
+
+
+		function CenterControl(controlDiv, map) {
+
+			// Set CSS for the control border.
+			var controlUI = document.createElement('div');
+			controlUI.style.backgroundColor = 'rgb(102, 53, 143)';
+			controlUI.style.border = '2px solid rgb(68, 1, 127)';
+			controlUI.style.borderRadius = '10px';
+			controlUI.style.boxShadow = '0 4px 12px rgba(200,0,0,.3)';
+			controlUI.style.cursor = 'pointer';
+			controlUI.style.marginBottom = '22px';
+			controlUI.style.textAlign = 'center';
+			controlUI.title = 'Click to center map in NYU';
+			controlDiv.appendChild(controlUI);
+
+			// Set CSS for the control interior.
+			var controlText = document.createElement('div');
+			controlText.style.color = 'rgb(255,255,255)';
+			controlText.style.fontFamily = 'Roboto,Arial,sans-serif';
+			controlText.style.fontSize = '16px';
+			controlText.style.lineHeight = '38px';
+			controlText.style.paddingLeft = '5px';
+			controlText.style.paddingRight = '5px';
+			controlText.innerHTML = 'Go to New York University (NYU)';
+			controlUI.appendChild(controlText);
+
+			// Setup the click event listeners: simply set the map to Chicago.
+			controlUI.addEventListener('click', function() {
+				map.setCenter(coordUniversity);
+				map.setZoom(15);
+			});
+
 		}
