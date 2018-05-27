@@ -34,11 +34,14 @@ var unlivableDistricts = [];
 var map;
 var shapeActive;
 var heatmap;
+var directionsService;
+var directionsRenderer;
 
 /*ranking variables*/
 var maxDistance = 0;
 var preferenceDistance = false;
 var preferencePrice = false;
+var selectTable ;
 /*Community District Sorted By distance between neighborhoods to NYU*/
 var filteredCD = [];
 
@@ -57,10 +60,15 @@ function getRandomInt(min, max) {
 	return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 function randomColorRGBA( a ){
+	var color;
 	var r = getRandomInt(0, 255);
 	var g = getRandomInt(0, 255);
 	var b = getRandomInt(0, 255);
-	return ("rgba(" +r+ "," +g+ "," +b+ "," +a+ ")");
+	if(r != 59 && g != 255 && b != 0){
+		return ("rgba(" +r+ "," +g+ "," +b+ "," +a+ ")");
+	}else{
+		randomColorRGBA(a)
+	}
 }
 /*Data Treatment
 */
@@ -192,7 +200,11 @@ function setMarker(image,coordinates,textHover) {
 	marker.setMap(map);
 	return marker;
 }
-
+var lineSymbol = {
+	path: 'M 0,-1 0,1',
+	strokeOpacity: 1,
+	scale: 4
+};
 function initMap() {
 	map = new google.maps.Map(document.getElementById('map'), {
 		center: coordUniversity,
@@ -370,6 +382,20 @@ function initMap() {
 	centerControlDiv.index = 1;
 	map.controls[google.maps.ControlPosition.BOTTOM_CENTER].push(centerControlDiv);
 
+	directionsService = new google.maps.DirectionsService();
+	directionsRenderer = new google.maps.DirectionsRenderer({
+		polylineOptions: {
+			strokeOpacity: 0.5,
+			strokeWeight: 6,
+			icons: [{
+				icon: lineSymbol,
+				offset: '0',
+				repeat: '20px'
+			}],
+			zIndex:99,
+		},
+		suppressMarkers:true,
+	});
 
 	var image = {
 		url: 'https://i.imgur.com/QDsm8jB.png',
@@ -407,6 +433,7 @@ class Neighborhood {
 	get coorCenter(){
 		return this._coorCenter;
 	}
+
 	draw(){
 		/*Icon To Neighborhood*/
 		const imageNB = {
@@ -415,11 +442,22 @@ class Neighborhood {
 			origin: new google.maps.Point(0, 0),
 			anchor: new google.maps.Point(15.5,15.5)
 		};
-		this._info = "<div class=\"infoNeigh\"><h5>"+this._name+"</h5>Neighborhood</div>";
-
+		if(this.distanceCar.length > 0){
+			console.log(this.distanceCar[0]);
+			this._info = "<div class=\"infoNeigh\"><h5>"+this._name+"</h5>Neighborhood <p>Distance To NYU :"+ (this.distanceCar[0]/1000).toFixed(2) +" Km</p></div>";
+		}else{
+			this._info = "<div class=\"infoNeigh\"><h5>"+this._name+"</h5>Neighborhood <p>"+"</p></div>";
+		}
+		var coor = this.coorCenter;
 		var marker = setMarker(imageNB,this.coorCenter,this.name);
 		var infowindow = new google.maps.InfoWindow({
 			content:this._info,
+
+		});
+		marker.addListener('click', function () {
+			infowindow.open(map,marker);
+			console.log(coor);
+			getRoute(coor);
 
 		});
 		marker.addListener('mouseover', function () {
@@ -475,7 +513,9 @@ class CommunityDistrict {
 			get multiPolygon(){
 				return this._multiPolygon;
 			}
-
+			get numberU(){
+				return this.numberUnits;
+			}
 			get neighborhoods(){
 				return this._neighborhoods;
 			}
@@ -534,7 +574,9 @@ class CommunityDistrict {
 			drawNB(){
 				var neighborhoodMarkers = [];
 				for( var i = 0 ;i < this._neighborhoods.length ; i++){
+					//if(this._neighborhoods[i].distanceCar.length > 0){
 					neighborhoodMarkers.push(this._neighborhoods[i].draw());
+					//}
 				}
 				return neighborhoodMarkers;
 			}
@@ -620,7 +662,7 @@ class CommunityDistrict {
 							var sumDistance = 0;
 							var numberNeigh = communityD.neighborhoods.length;
 							for (var i = 0 ; i < numberNeigh ; i++){
-								communityD.neighborhoods[i].distanceCar.push(response.rows[i]);
+								communityD.neighborhoods[i].distanceCar.push(response.rows[i].elements[0].distance.value);
 								sumDistance += response.rows[i].elements[0].distance.value;
 							}
 							/*Average cast to KM*/
@@ -637,6 +679,20 @@ class CommunityDistrict {
 			})
 		}
 
+		function getRoute(coorObjetive,callback){
+			var request = {
+				origin : coorObjetive, /*site to show destination*/
+				destination: coordUniversity,
+				travelMode:'DRIVING'
+			}
+			directionsRenderer.setMap(map);
+			directionsService.route(request,function(result,status){
+				if(status == 'OK'){
+					directionsRenderer.setDirections(result);
+				}
+			});
+		}
+
 		function compareById(a,b) {
 			if (a.id < b.id)
 			return -1;
@@ -650,6 +706,10 @@ class CommunityDistrict {
 			borough = getDataShapeDistric(getDataNeighborhood);
 			getCrimes(toggleHeatmap);
 			$('#ModalWelcome').modal('show');
+
+
+
+
 		});
 
 		/*For bootstrap -Table*/
@@ -666,15 +726,30 @@ class CommunityDistrict {
 			}
 			return '<div class="text-center"><strong align="center" style="margin:auto">'+ (index + 1)+'</strong></div>';
 		}
+		function distanceInKm(value, row, index){
+			return Number(row.distanceCar).toFixed(2) + "Km";
+		}
+		function numberUnits(value, row, index){
+			return Number(row.numberUnits);
+		}
+
+
 		/*/Clean Code/Clean Code/Clean Code/Clean Code/Clean Code/Clean Code/Clean Code/Clean Code*/
 
 
 
 		/*SORT BY ACTIVE PARAMETERS*/
 		function updateTable(){
+
+			$('#table').bootstrapTable('updateRow', {index:0});
 			$('#table').bootstrapTable({
 				data:filteredCD,
+				showExport: true,
+        exportOptions: {
+            fileName: 'AsinyTableFilter'
+        },
 				onClickRow: function (row,$element){
+
 					if(typeof(shapeActive) == "object" && typeof(neigMarkActive) == "object"){
 						shapeActive.setMap(null);
 						for(var i = 0 ;i < neigMarkActive.length ; i++){
@@ -682,34 +757,34 @@ class CommunityDistrict {
 						}
 					};
 					console.log(row);
-					$element.css({backgroundColor: row.color});
+				 	$element.css({backgroundColor: row.color});
 					shapeActive = row.draw(row.color);
 					neigMarkActive = row.drawNB();
 					$('#nameBoro').html(row.borough);
 					$('#numberCD').html("Community District : "+row.numberCD);
 
-
+					buildRing(row.bedroomUnits[0].value, row.numberUnits, "N Habitations "+ row.bedroomUnits[0].text, "#escRing");
 					drawChart(row.incomeUnits);
-					if(row.distanceCar != 'undefined'){
-						$('#distanceAverage').html("Average distance in car: "+row.distanceCar.toFixed(2) + "Km");
+					if(row.distanceCar != null){
+						$('#distanceAverage').html("Average distance by car to NYU: "+  Number(row.distanceCar).toFixed(2) + "Km");
 					}
+					directionsRenderer.setMap(null)
 					map.setCenter(row.neighborhoods[0].coorCenter);
 					map.setZoom(13);
-
 				},
 				//pageList:false,
 
-				clickToSelect:true,
+
 				//onlyInfoPagination:true,
 				//rememberOrder:true,
 				//pagination:true,
-				checkbox: true,
-				onCheck: function(row,$element){
-
-					alert("hi");
-				}
+				//checkbox: true,
 			});
-			$('#table').bootstrapTable('updateRow', {index:0});
+
+			/*Update text in button to export table*/
+			$('.export .caret').html("Export To");
+			$('.keep-open .caret').html("Columns");
+
 		}
 		/*FOR TEST
 		*/
@@ -822,10 +897,17 @@ class CommunityDistrict {
 			$('#distance').prop('disabled', false);
 			$('#distance').removeClass("btn-warning");
 			document.getElementById("distance").setAttribute('onclick','sortByDistance()')
+			$('#table').bootstrapTable('showColumn', 'dis');
 			sortByDistance();
 		}
 		function sortByDistance(){
+
 			preferenceDistance = pressButton($('#distance'));
+			if(preferenceDistance){
+				$('#table').bootstrapTable('showColumn', 'dis');
+			}else{
+				$('#table').bootstrapTable('hideColumn', 'dis');
+			}
 			sortByPreferences();
 		}
 		async function calculatePricing(){
@@ -837,10 +919,16 @@ class CommunityDistrict {
 			$('#price').prop('disabled', false);
 			$('#price').removeClass("btn-warning");
 			document.getElementById("price").setAttribute('onclick','sortByPrice()');
+			$('#table').bootstrapTable('showColumn', 'dis');
 			sortByPrice();
 		}
 		function sortByPrice(){
 			preferencePrice = pressButton($('#price'));
+			if(preferencePrice){
+				$('#table').bootstrapTable('showColumn', 'price');
+			}else{
+				$('#table').bootstrapTable('hideColumn', 'price');
+			}
 			sortByPreferences();
 		}
 
@@ -870,13 +958,13 @@ class CommunityDistrict {
 		.attr("transform", "translate(0,-10)")
 		.text("Houses according to cost");
 
-		  g.append("text")
-				.attr("transform", "translate(200,0)")
-				.attr("transform", "rotate(-90)")
-		    .attr("y", 6)
-		    .attr("dy", "0.71em")
-		    .attr("text-anchor", "end")
-		    .text("Frequency");
+		g.append("text")
+		.attr("transform", "translate(200,0)")
+		.attr("transform", "rotate(-90)")
+		.attr("y", 6)
+		.attr("dy", "0.71em")
+		.attr("text-anchor", "end")
+		.text("Number of Houses");
 		/*Barchart responsive listener*/
 		window.addEventListener("resize", paint);
 
@@ -931,10 +1019,10 @@ class CommunityDistrict {
 			heatmap.setMap(heatmap.getMap() ? null : map);
 		}
 
-
+		/*Footer Button to control map*/
 		function CenterControl(controlDiv, map) {
 
-			// Set CSS for the control border.
+			/*Style personalization for the button*/
 			var controlUI = document.createElement('div');
 			controlUI.style.backgroundColor = 'rgb(102, 53, 143)';
 			controlUI.style.border = '2px solid rgb(68, 1, 127)';
@@ -946,7 +1034,7 @@ class CommunityDistrict {
 			controlUI.title = 'Click to center map in NYU';
 			controlDiv.appendChild(controlUI);
 
-			// Set CSS for the control interior.
+			/* Set CSS for the control interior.*/
 			var controlText = document.createElement('div');
 			controlText.style.color = 'rgb(255,255,255)';
 			controlText.style.fontFamily = 'Roboto,Arial,sans-serif';
@@ -957,10 +1045,121 @@ class CommunityDistrict {
 			controlText.innerHTML = 'Go to New York University (NYU)';
 			controlUI.appendChild(controlText);
 
-			// Setup the click event listeners: simply set the map to Chicago.
+			// Setup the click event listeners:set center in NYU
 			controlUI.addEventListener('click', function() {
 				map.setCenter(coordUniversity);
 				map.setZoom(15);
 			});
 
 		}
+
+
+
+/*Pie chart */
+
+var esc=1;
+var dtd=2;
+var exp=16;
+
+buildRing(esc, 52, "Escalations", "#escRing");
+buildRing(dtd, 52, "DTDs", "#dtdRing");
+buildRing(exp, 52, "Expired", "#expRing");
+
+function buildRing(num, total, label, target){
+  var dif = total - num;
+  var data = [
+    { group: label, count: num },
+    { group: "Systems", count: dif }
+  ]
+
+  var width  = 200,
+      height = 120,
+      offset = 25,
+      radius = Math.min(width, height) / 2;
+
+  var color = d3.scaleOrdinal(["#8a2bb1", "rgba(45, 48, 53,0.8)", "#CCE2EA", "#cccccc"])
+      //.range(["#65A6BF", "#9AC4D5", "#CCE2EA", "#cccccc"]);
+
+  var arc = d3.arc()
+      .outerRadius(radius - 10)
+      .innerRadius(radius - 40);
+
+  // second arc for labels
+  var arc2 = d3.arc()
+    .outerRadius(radius)
+    .innerRadius(radius + 24);
+
+  var pie = d3.pie()
+      .sort(null)
+      .startAngle(1.1*Math.PI)
+      .endAngle(3.1*Math.PI)
+      .value(function(d) { return d.count; });
+
+  var svg = d3.select(target).append("svg")
+      //.attr("id", target+"pie")
+      .attr("width", width + offset)
+      .attr("height", height + offset)
+      //.attr("float", "right")
+      //.attr('viewBox', '0 0 ' + width + offset +''+ width + offset)
+      .attr('perserveAspectRatio', 'xMinYMid')
+      .append("g")
+      .attr("transform", "translate(" + (width-offset)  + "," + (height + offset) / 2 + ")");
+
+    data.forEach(function(d) {
+      d.count = +d.count;
+    });
+
+    var g = svg.selectAll(".arc")
+        .data(pie(data))
+        .enter().append("g")
+        .attr("class", "arc");
+
+    g.append("path")
+        .style("fill", function(d) { return color(d.data.group); })
+        .transition().delay(function(d, i) { return i * 500; }).duration(500)
+        .attrTween('d', function(d) {
+           var i = d3.interpolate(d.startAngle+0.1, d.endAngle);
+           return function(t) {
+             d.endAngle = i(t);
+             return arc(d);
+           };
+        })
+        //.on("mouseover", function(){return tooltip.style("visibility", "visible");})
+        //.on("mousemove", function(){return tooltip.style("top",
+            //(d3.event.pageY-10)+"px").style("left",(d3.event.pageX+10)+"px");})
+        //.on("mouseout", function(){return tooltip.style("visibility", "hidden");});
+        //.append("svg:title")
+        //.text( function(d) { return d.count } )
+
+    g.append("text")
+        .attr("transform", function(d) { return "translate(" + arc2.centroid(d) + ")"; })
+        .attr("dy", ".35em")
+        .attr("class", "d3-label")
+        .style("text-anchor", "middle")
+        .text(function(d) { return d.data.count; });
+
+    g.append("text")
+        .attr("class", "pie-total")
+        //.attr('dx', "-18px")
+        .attr('dy', '8px')
+        .attr('text-anchor', 'middle')
+        .text( num +" "+ label )
+				.style("fill","white")
+				.attr("transform", "translate("+-120+",0)")
+        .attr('class', 'd3-label-total');
+
+  // var aspect = width / height,
+  //     chart = $("#pie");
+  // $(window).on("resize", function() {
+  //     var targetWidth = Math.min(width + offset, chart.parent().width());
+  //     chart.attr("width", targetWidth);
+  //     chart.attr("height", targetWidth / aspect);
+  // }).trigger('resize');
+
+  var tooltip = d3.select("body")
+    .append("div")
+    .style("position", "absolute")
+    .style("z-index", "10")
+    .style("visibility", "hidden")
+    .text("a simple tooltip");
+}

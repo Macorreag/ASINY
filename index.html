@@ -11,15 +11,16 @@
   <!--Se puede definir los tipos de estilos para cada pantalla especifica media="screen and (device-height: 600px)" -->
   <!--llamado a bootstrap 4 version min -->
 
+  <script  src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js"></script>
   <link
   href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" >
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.12.1/bootstrap-table.min.css">
   <script  src="https://code.jquery.com/jquery-3.3.1.js" ></script>
-  <!-- <script  src="https://d3js.org/d3.v3.min.js"></script> -->
+  <!--PAsar a CVS-->
   <script  src="https://d3js.org/d3.v5.js"></script>
+
   <script  src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
   <!-- Latest compiled and minified CSS -->
-
 
   <!-- Latest compiled and minified JavaScript -->
   <script  src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.12.1/bootstrap-table.min.js"></script>
@@ -27,7 +28,13 @@
   <link rel="StyleSheet" href="css/style.css"  >
 
   <!-- Latest compiled and minified Locales -->
+
   <script  src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.12.1/locale/bootstrap-table-es-ES.js"></script>
+  <!-- Bootstrap Dependence to Export Table -->
+  <script  src="https://rawgit.com/wenzhixin/bootstrap-table/master/src/extensions/export/bootstrap-table-export.js"></script>
+  <!-- JQueryPlugin to ExportTable -->
+  <script  src="https://rawgit.com/hhurz/tableExport.jquery.plugin/master/tableExport.js"></script>
+
   <title>ASINY</title>
   <style>
 
@@ -71,7 +78,7 @@
         <div class="modal-body">
           Select the filters in the central bar, then click on the bar below the district you want to analyze.
           There are also tools in the same bar in the middle so you can make your decision you only need to select them or deselect them if you want to hide them.
-  </div>
+        </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-primary" data-dismiss="modal" data-target="#ModalWelcome" >ok</button>
           <!--<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>-->
@@ -108,84 +115,138 @@
               </div>
             </div>
             <div class="row">
-              <div class="table-responsive">
-                <div class="container">
-                  <table id="table"
-                  data-classes="table table-no-bordered"
-                  data-height="460">
-                  <thead>
-                    <tr>
-                      <th data-formatter="runningFormatter">Position</th>
-                      <th data-field="borough">District</th>
-                      <th data-field="numberCD">CD N°</th>
-                    </tr>
-                  </thead>
-                </table>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+              <div class="container">
+                <nav class="navbar navbar-expand-lg navbar-dark bg-primary rounded-bottom">
 
 
-    </div>
-    <!-- Example split danger button -->
-    <div class="">
-      <nav class="navbar navbar-expand-lg navbar-dark bg-primary rounded-bottom">
-        <a class="navbar-brand "><strong>Filters</strong></a>
+                  <button class="navbar-toggler"  type="button" data-toggle="collapse" data-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                  </button>
 
-        <button class="navbar-toggler"  type="button" data-toggle="collapse" data-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
-          <span class="navbar-toggler-icon"></span>
-        </button>
+                  <div class="collapse navbar-collapse margin-sm" id="navbarNavDropdown">
+                    <br>
+                    <br>
+                    <div id ="preferences"class="container">
+                      <ul class="navbar-nav">
+                        <button id="distance" type="button" class="btn-primary text-light p-md" onclick="calculateDistance()" >Distance</button>
+                        <button id="price" type="button" class="btn-primary text-light" onclick="calculatePricing()" >Pricing</button>
 
-        <div class="collapse navbar-collapse margin-sm" id="navbarNavDropdown">
-          <br>
-          <br>
-          <div class="container">
-            <ul class="navbar-nav">
-              <button id="distance" type="button" class="btn-primary text-light p-md" onclick="calculateDistance()" >Distance</button>
-              <button id="price" type="button" class="btn-primary text-light" onclick="calculatePricing()" >Pricing</button>
-              <li class="" >
-              </li>
-              <li class="nav-item">
-              </li>
-              <!-- <li  class="nav-item">
-                <a class="nav-link" href="#">Pricing</a>
-              </li> -->
-              <li class="nav-item dropdown ">
-                <a class="nav-link dropdown-toggle"  id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                  Decision tools
-                </a>
-                <div class="dropdown-menu bg-primary" aria-labelledby="navbarDropdownMenuLink">
-                  <button id="crimes" type="button" class="btn-outline-primary btn-block text-light  p-md" onclick="toggleHeatmap()" >Show Crimes</button>
-                  <a class="dropdown-item" href="#">walking</a>
-                  <a class="dropdown-item" href="#">public transport</a>
+                        <li class="nav-item">
+                        </li>
+                        <!-- <li  class="nav-item">
+                        <a class="nav-link" href="#">Pricing</a>
+                      </li> -->
+                      <li class="nav-item dropdown ">
+                        <a class="nav-link dropdown-toggle"  id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                          tools
+                        </a>
+                        <div class="dropdown-menu bg-primary" aria-labelledby="navbarDropdownMenuLink">
+                          <button id="crimes" type="button" class="btn-outline-primary btn-block text-light  p-md" onclick="toggleHeatmap()" >Show Crimes</button>
+                          <!-- <a class="dropdown-item" href="#">walking</a>
+                          <a class="dropdown-item" href="#">public transport</a> -->
+                        </div>
+                      </li>
+                    </ul>
+                  </div>
+
                 </div>
-              </li>
-            </ul>
+              </nav>
+
+            </div>
+            <!-- <div class="row"> -->
+            <div class="container">
+
+              <table id="table"
+
+
+              class="table table-sm"
+              data-click-to-select="true"
+              data-classes="table table-no-bordered"
+              data-show-columns="true"
+              data-height="460">
+              <thead>
+                <tr>
+                  <th data-formatter="runningFormatter">Position</th>
+                  <th data-field="borough">District</th>
+                  <th data-field="numberCD">CD N°</th>
+                  <th data-field="dis" data-formatter="distanceInKm" data-visible="false">Distance Km</th>
+                  <th data-field="price" data-formatter="numberUnits" data-visible="false">Disponible Houses</th>
+                </tr>
+              </thead>
+            </table>
+            <!-- </div> -->
+
           </div>
 
         </div>
-      </nav>
+      </div>
     </div>
 
 
+  </div>
+  <!-- Example split danger button -->
+  <div class="">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary rounded-bottom">
+      <a class="navbar-brand "><strong>Filters</strong></a>
 
-    <div class="col-3  panel">
-      <br>
-      <div class="container rounded margin-top">
-        <h2 id="nameBoro"></h2>
-        <h4 id="numberCD"></h4>
-        <svg class="container rounded" id="barChart" width="100%" height="200px"></svg>
+      <button class="navbar-toggler"  type="button" data-toggle="collapse" data-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse margin-sm" id="navbarNavDropdown">
         <br>
-        <strong id="distanceAverage">Distance Variable</strong>
+        <br>
+        <div class="container">
+          <ul class="navbar-nav">
+            <button id="distance" type="button" class="btn-primary text-light p-md" onclick="calculateDistance()" >Distance</button>
+            <button id="price" type="button" class="btn-primary text-light" onclick="calculatePricing()" >Pricing</button>
+            <button id="price" type="button" class="btn-primary text-light" onclick="calculatePricing()" >Pricing</button>
+
+            <li class="nav-item">
+            </li>
+            <!-- <li  class="nav-item">
+            <a class="nav-link" href="#">Pricing</a>
+          </li> -->
+          <li class="nav-item dropdown ">
+            <a class="nav-link dropdown-toggle"  id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              Decision tools
+            </a>
+            <div class="dropdown-menu bg-primary" aria-labelledby="navbarDropdownMenuLink">
+              <button id="crimes" type="button" class="btn-outline-primary btn-block text-light  p-md" onclick="toggleHeatmap()" >Show Crimes</button>
+              <!-- <a class="dropdown-item" href="#">walking</a>
+              <a class="dropdown-item" href="#">public transport</a> -->
+            </div>
+          </li>
+        </ul>
       </div>
 
+    </div>
+  </nav>
+</div>
 
 
 
+<div class="col-3  panel">
+  <br>
+  <div class="container rounded margin-top">
+    <h2 id="nameBoro"></h2>
+    <h4 id="numberCD"></h4>
+    <svg class="container rounded" id="barChart" width="100%" height="200px"></svg>
+
+    <br>
+    <strong id="distanceAverage">Distance Variable</strong>
+    <div id="charts">
+
+      <div id="escRing" class="ring"></div>
+      <div id="dtdRing" class="ring"></div>
+      <div id="expRing" class="ring"></div>
     </div>
   </div>
+
+
+
+</div>
+</div>
 </div>
 
 <script type="text/javascript" src="js/index.js"></script>

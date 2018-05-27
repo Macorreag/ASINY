@@ -79,6 +79,7 @@ background-color: rgba(0, 0, 0,0.5);
 }
 .axis--x .tick text{
   transform: rotate(90);
+
 }
 .axis--y .tick line{
   stroke : white;
@@ -88,6 +89,7 @@ background-color: rgba(0, 0, 0,0.5);
   stroke : white;
   stroke-width  : 1;
 }
+
 /*Icons */
 
 .winner {
@@ -112,4 +114,20 @@ background-color: rgba(0, 0, 0,0.5);
 /*InfoWindow no habitable shape*/
 .infoIna{
 
+}
+/*export Button of table
+*/
+.menuitem{
+background-color: blue;
+}
+
+
+
+/**/
+
+.ring{
+  float:left;
+}
+svg {
+  font-family:Helvetica;
 }
