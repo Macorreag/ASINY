@@ -9,6 +9,7 @@ CD is a  COMMUNITY DISTRICT
 */
 const SHAPECD = "https://services5.arcgis.com/GfwWNkhOj9bNBqoJ/arcgis/rest/services/nycd/FeatureServer/0/query?where=1=1&outFields=*&outSR=4326&f=geojson"
 const FARMERSMARKETS = "https://data.cityofnewyork.us/api/views/j8gx-kc43/rows.json?accessType=DOWNLOAD";
+const MUSEUMS = "https://data.cityofnewyork.us/api/views/fn6f-htvy/rows.json?accessType=DOWNLOAD"
 /*
 features[i].properties.BoroCD  = 100 * BOROUGH + CD
 features[i].geometry.coordinates[j] = Coordinates of Shape
@@ -31,14 +32,20 @@ const coordUniversity = {	/*Position University*/
 var borough=[];
 var crimeCoordinates = [];
 var unlivableDistricts = [];
+var museumsArray = [];
+
 /*Variables for GMaps*/
 var map;
 var shapeActive;
 var heatmap;
 var directionsService;
 var directionsRenderer;
+var museumDisplay = [];
 
+/*tools Activate*/
+var crimeMapActive = false;
 /*ranking variables*/
+var museumActive = false;
 var maxDistance = 0;
 var preferenceDistance = false;
 var preferencePrice = false;
@@ -112,10 +119,8 @@ function getCrimes(callback){
 	$.ajax({
 		url: "https://data.cityofnewyork.us/resource/fj84-7huk.json",
 	}).done(function(data){
-		console.log(data);
 		for (var i = 0; i < data.length; i++) {
 			crimeCoordinates.push(
-
 				new google.maps.LatLng(
 					data[i].latitude,
 					data[i].longitude
@@ -501,13 +506,13 @@ class CommunityDistrict {
 		this._bedroomUnits = new Array(
 			/*Number of Bedroom by unit*/
 			{"value":0 ,"text":"0 Bedroom"},
-			{"value":0 ,"text":"1"},
-			{"value":0 ,"text":"2"},
-			{"value":0 ,"text":"3"},
-			{"value":0 ,"text":"4"},
-			{"value":0 ,"text":"5"},
-			{"value":0 ,"text":"6"},
-			{"value":0 ,"text":"UD"}),
+			{"value":0 ,"text":"1 Bedroom"},
+			{"value":0 ,"text":"2 Bedrooms"},
+			{"value":0 ,"text":"3 Bedrooms"},
+			{"value":0 ,"text":"4 Bedrooms"},
+			{"value":0 ,"text":"5 Bedrooms"},
+			{"value":0 ,"text":"6 Bedrooms"},
+			{"value":0 ,"text":"Undefined Number of Bedrooms"}),
 			this._incomeUnits = new Array(
 				/*Level of IncomeUnits*/
 				{"value":0 ,"text":"Extremely low"},
@@ -594,9 +599,7 @@ class CommunityDistrict {
 			drawNB(){
 				var neighborhoodMarkers = [];
 				for( var i = 0 ;i < this._neighborhoods.length ; i++){
-					//if(this._neighborhoods[i].distanceCar.length > 0){
 					neighborhoodMarkers.push(this._neighborhoods[i].draw());
-					//}
 				}
 				return neighborhoodMarkers;
 			}
@@ -621,6 +624,64 @@ class CommunityDistrict {
 				console.log(error);
 			})
 		}
+
+		function getMuseums(){
+			var data = $.get(MUSEUMS, () => {})
+			.done(function () {
+				console.log("asa");
+				for (var i = 0; i < data.responseJSON.data.length; i++){
+					var museum = {
+						"coordinates" : coordinateGmaps(data.responseJSON.data[i][8]),
+						"name"  : data.responseJSON.data[i][9],
+						"number" : data.responseJSON.data[i][10],
+						"WebPage" : data.responseJSON.data[i][11],
+						"anchor" :coordinateGmaps(data.responseJSON.data[i][8])
+					};
+					museumsArray.push(museum);
+				}
+				museumActive = true;
+				//callback();
+				document.getElementById("museums").setAttribute('onclick','displayMuseums()')
+
+			})
+			.fail(function (error) {
+				console.error(error);
+			})
+		}
+		/*For manage museums*/
+		function displayMuseums(){
+			var imageMuseum = {
+				url: 'https://i.imgur.com/gKRiI1K.png',
+				size: new google.maps.Size(32, 32),
+				origin: new google.maps.Point(0, 0),
+				anchor: new google.maps.Point(15.5,15.5)
+			};
+			if(museumActive){
+				museumDisplay = [];
+				for (var i =0 ;i < museumsArray.length ; i++){
+					var marker = new google.maps.Marker({
+						position:museumsArray[i].coordinates,
+						map: map,
+						/*Mapa donde se colocara el marker*/
+						icon: imageMuseum,
+						title: museumsArray[i].name,
+						/*Text show in event Hover*/
+						zIndex: 100
+					});
+					marker.setMap(map);
+					museumDisplay.push(marker);
+				}
+				museumActive = false;
+			}else{
+				for (var i =0 ;i < museumDisplay.length ; i++){
+					museumDisplay[i].setMap(null);
+				}
+				museumActive = true;
+			}
+			pressButton($("#museums"));
+		}
+
+
 		function getFarmersMarkets(){
 			var data = $.get(FARMERSMARKETS,function(){})
 			.done(function(){
@@ -736,6 +797,7 @@ class CommunityDistrict {
 			borough = getDataShapeDistric(getDataNeighborhood);
 			getCrimes(toggleHeatmap);
 			$('#ModalWelcome').modal('show');
+			getMuseums();
 
 
 
@@ -762,16 +824,54 @@ class CommunityDistrict {
 		function numberUnits(value, row, index){
 			return Number(row.numberUnits);
 		}
+		function bedroomUnits0(value, row, index){
+			return Number(row.bedroomUnits[0].value);
+		}
+		function bedroomUnits1(value, row, index){
+			return Number(row.bedroomUnits[1].value);
+		}
+		function bedroomUnits2(value, row, index){
+			return Number(row.bedroomUnits[2].value);
+		}
+		function bedroomUnits3(value, row, index){
+			return Number(row.bedroomUnits[3].value);
+		}
+		function bedroomUnits4(value, row, index){
+			return Number(row.bedroomUnits[4].value);
+		}
+		function bedroomUnits5(value, row, index){
+			return Number(row.bedroomUnits[5].value);
+		}
+		function bedroomUnits6(value, row, index){
+			return Number(row.bedroomUnits[6].value);
+		}
+		function incomeUnits0(value, row, index){
+			return Number(row.incomeUnits[0].value);
+		}
+		function incomeUnits1(value, row, index){
+			return Number(row.incomeUnits[1].value);
+		}
+		function incomeUnits2(value, row, index){
+			return Number(row.incomeUnits[2].value);
+		}
+		function incomeUnits3(value, row, index){
+			return Number(row.incomeUnits[3].value);
+		}
+		function incomeUnits4(value, row, index){
+			return Number(row.incomeUnits[4].value);
+		}
+		function incomeUnits5(value, row, index){
+			return Number(row.incomeUnits[5].value);
+		}
+		function incomeUnits6(value, row, index){
+			return Number(row.incomeUnits[6].value);
+		}
 
 
 		/*/Clean Code/Clean Code/Clean Code/Clean Code/Clean Code/Clean Code/Clean Code/Clean Code*/
 
-
-
 		/*SORT BY ACTIVE PARAMETERS*/
-		function updateTable(callback){
-
-
+		function updateTable(){
 			$('#table').bootstrapTable({
 				data:filteredCD,
 				showExport: true,
@@ -781,9 +881,9 @@ class CommunityDistrict {
 				onClickRow: function (row,$element){
 
 					if(typeof(shapeActive) == "object" && typeof(neigMarkActive) == "object"){
-						shapeActive.setMap(null);
+						shapeActive.setVisible(false);
 						for(var i = 0 ;i < neigMarkActive.length ; i++){
-							neigMarkActive[i].setMap(null);
+							neigMarkActive[i].setVisible(false);
 						}
 					};
 					console.log(row);
@@ -796,7 +896,7 @@ class CommunityDistrict {
 					//buildRing(row.bedroomUnits[0].value, row.numberUnits, "N Habitations "+ row.bedroomUnits[0].text, "#escRing");
 					drawChart(row.incomeUnits);
 					drawPie(row.bedroomUnits);
-					directionsRenderer.setMap(null)
+					directionsRenderer.setMap(null);
 					map.setCenter(row.neighborhoods[0].coorCenter);
 					map.setZoom(13);
 				},
@@ -810,26 +910,11 @@ class CommunityDistrict {
 			});
 
 			/*Update text in button to export table*/
-			callback();
+
 			$('.export .caret').html("Export To");
 			$('.keep-open .caret').html("Columns");
 
 		}
-
-		function showRow(){
-			if(preferenceDistance){
-				//$('#table').bootstrapTable('showColumn', 'dis');
-			}else{
-				//	$('#table').bootstrapTable('hideColumn', 'dis');
-			}
-			if(preferencePrice){
-				//$('#table').bootstrapTable('showColumn', 'price');
-			}else{
-				//	$('#table').bootstrapTable('showColumn', 'price');
-			}
-		}
-		/*FOR TEST
-		*/
 		async function calculateDistances(){
 			for(var i = 0;i < borough.length ;i++ ){
 				for (var j = 0;j <borough[i].length ;j++){
@@ -966,7 +1051,7 @@ class CommunityDistrict {
 		}
 		function sortByPreferences(){
 			filteredCD.sort(calculatePoints);
-			updateTable(showRow);
+			updateTable();
 		}
 
 
@@ -1044,12 +1129,12 @@ class CommunityDistrict {
 			.on("mouseover", function(d){
 
 				tooltip.style("visibility", "visible")
-				.html("<h1>"+d.value+"</h1>"+  d.text)
+				.html("There are <h3> "+d.value+"</h3>  houses that has a price "+ d.text)
 				;})
-				.on("mousemove", function(d){
+				.on("mousemove", function(){
 					tooltip.style("top", (event.pageY-10)+"px").style("left",(event.pageX+10)+"px")
 					;})
-					.on("mouseout", function(d){
+					.on("mouseout", function(){
 						tooltip.style("visibility", "hidden");
 					});
 					;
@@ -1063,13 +1148,13 @@ class CommunityDistrict {
 				/*barChart end*/
 
 				/*Control heatmap*/
-				function toggleHeatmap() {
+				function toggleHeatmap(){
+					pressButton($('#crimes'));
 					heatmap.setMap(heatmap.getMap() ? null : map);
 				}
 
 				/*Footer Button to control map*/
 				function CenterControl(controlDiv, map) {
-
 					/*Style personalization for the button*/
 					var controlUI = document.createElement('div');
 					controlUI.classList.add("butStyle");
@@ -1120,9 +1205,7 @@ class CommunityDistrict {
 
 					var svg = d3.select(".pie")
 					.append("svg")
-
 					.attr("viewBox", "0 0 " + width + " " + height)
-
 					.append("g")
 					.attr("transform", "translate(" + width/2+ "," + height/2 + ")");
 
@@ -1130,24 +1213,26 @@ class CommunityDistrict {
 					.data(pie(data))
 					.enter().append("g")
 					.on("mouseover", function(d){
-						tooltip.html("<h1>"+d.value+"</h1>"+d.data.text);
+						tooltip.html(
+							"There are <h4>"+d.value+"</h4> houses that has "+d.data.text
+						);
 						tooltip.style("visibility", "visible");})
-					.on("mousemove", function(){
-						tooltip.style("top", (event.pageY-10)+"px").style("left",(event.pageX+10)+"px");})
-					.on("mouseout", function(){
+						.on("mousemove", function(){
 
-								return tooltip.style("visibility", "hidden");})
+							tooltip.style("top", (event.pageY-10)+"px").style("left",(event.pageX+10)+"px");
+						})
+						.on("mouseout", function(){
+							tooltip.style("visibility", "hidden");})
+							.attr("class", "arc");
 
-								.attr("class", "arc");
+							g.append("path")
+							.attr("d", arc)
+							.style("fill", function(d) { return color(d.value); });
 
-								g.append("path")
-								.attr("d", arc)
-								.style("fill", function(d) { return color(d.value); });
+							g.append("text")
+							.style("font-size", "24px")
+							.attr("transform", function(d) { return "translate(" + labelArc.centroid(d) + ")"; })
+							.attr("dy", "20")
+							.text(function(d) { return d.value; });
 
-								g.append("text")
-								.attr("transform", function(d) { return "translate(" + labelArc.centroid(d) + ")"; })
-								.attr("dy", ".35em")
-								.text(function(d) { return d.value; });
-
-							}
-							//drawPie([1, 2, 3,4, 5, 6,7, 8, 9]);
+						}

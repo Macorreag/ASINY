@@ -44,7 +44,7 @@
 <body>
 
 
-  <div id="tooltip" >
+  <div id="tooltip" class="rounded">
 
   </div>
   <!-- Modal -->
@@ -132,140 +132,120 @@
                       <ul class="navbar-nav">
                         <button id="distance" type="button" class="btn-primary text-light p-md" onclick="calculateDistance()" >Distance</button>
                         <button id="price" type="button" class="btn-primary text-light" onclick="calculatePricing()" >Pricing</button>
+                      </ul>
+                    </div>
 
-                        <li class="nav-item">
-                        </li>
-                        <!-- <li  class="nav-item">
-                        <a class="nav-link" href="#">Pricing</a>
-                      </li> -->
-                      <li class="nav-item dropdown ">
-                        <a class="nav-link dropdown-toggle"  id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                          tools
-                        </a>
-                        <div class="dropdown-menu bg-primary" aria-labelledby="navbarDropdownMenuLink">
-                          <button id="crimes" type="button" class="btn-outline-primary btn-block text-light  p-md" onclick="toggleHeatmap()" >Show Crimes</button>
-                          <!-- <a class="dropdown-item" href="#">walking</a>
-                          <a class="dropdown-item" href="#">public transport</a> -->
-                        </div>
-                      </li>
-                    </ul>
                   </div>
+                </nav>
 
-                </div>
-              </nav>
+              </div>
+              <!-- <div class="row"> -->
+              <div class="container">
+
+                <table id="table"
+
+                class="table table-sm"
+                data-click-to-select="true"
+                data-classes="table table-no-bordered"
+                data-show-columns="true"
+                data-height="460">
+                <thead>
+                  <tr>
+                    <th data-formatter="runningFormatter">Position</th>
+                    <th data-field="borough">District</th>
+                    <th data-field="numberCD">CD N°</th>
+                    <th data-field="dis" data-formatter="distanceInKm" data-visible="false">Distance Km</th>
+                    <th data-field="price" data-formatter="numberUnits" data-visible="false">Disponible Houses</th>
+                    <th data-field="bedroomUnits0" data-formatter="bedroomUnits0"   data-visible="false">Houses with <br> 0 bedrooms</th>
+                    <th data-field="bedroomUnits1" data-formatter="bedroomUnits1"   data-visible="false">Houses with <br> 1 bedroom</th>
+                    <th data-field="bedroomUnits2" data-formatter="bedroomUnits2"  data-visible="false">Houses with <br> 2 bedroom</th>
+                    <th data-field="bedroomUnits4" data-formatter="bedroomUnits3"  data-visible="false">Houses With <br> 3 bedrooms</th>
+                    <th data-field="bedroomUnits3" data-formatter="bedroomUnits4"  data-visible="false">Houses With <br> 4 bedrooms</th>
+                    <th data-field="bedroomUnits5" data-formatter="bedroomUnits5"  data-visible="false">Houses With  <br>5 bedrooms</th>
+                    <th data-field="bedroomUnits6" data-formatter="bedroomUnits6"  data-visible="false">Houses With <br> undefined number bedrooms</th>
+                    <th data-field="incomeUnits0" data-formatter="incomeUnits0"   data-visible="false">Houses with <br> Extremely low cost</th>
+                    <th data-field="incomeUnits1" data-formatter="incomeUnits1"   data-visible="false">Houses with <br> very low cost</th>
+                    <th data-field="incomeUnits2" data-formatter="incomeUnits2"  data-visible="false">Houses with <br>  low  const</th>
+                    <th data-field="incomeUnits3" data-formatter="incomeUnits3"  data-visible="false">Houses with <br>moderate low cost</th>
+                    <th data-field="incomeUnits4" data-formatter="incomeUnits4"  data-visible="false">Houses with <br> middle cost</th>
+                    <th data-field="incomeUnits5" data-formatter="incomeUnits5"  data-visible="false">Houses with <br> Other cost</th>
+                  </tr>
+
+                </thead>
+              </table>
+              <!-- </div> -->
 
             </div>
-            <!-- <div class="row"> -->
-            <div class="container">
-
-              <table id="table"
-
-              class="table table-sm"
-              data-click-to-select="true"
-              data-classes="table table-no-bordered"
-              data-show-columns="true"
-              data-height="460">
-              <thead>
-                <tr>
-                  <th data-formatter="runningFormatter">Position</th>
-                  <th data-field="borough">District</th>
-                  <th data-field="numberCD">CD N°</th>
-
-                  <th data-field="dis" data-formatter="distanceInKm" data-visible="false">Distance Km</th>
-                  <th data-field="price" data-formatter="numberUnits" data-visible="false">Disponible Houses</th>
-                  <th data-field="bedroom0" data-formatter="numberUnits" data-visible="false">Houses With 0 bedroomUnits</th>
-                </tr>
-
-              </thead>
-            </table>
-            <!-- </div> -->
 
           </div>
+        </div>
+      </div>
+
+
+    </div>
+    <!-- Example split danger button -->
+    <div class="">
+      <nav class="navbar navbar-expand-lg navbar-dark bg-primary rounded-bottom">
+        <a class="navbar-brand "><strong>Tools</strong></a>
+
+        <button class="navbar-toggler"  type="button" data-toggle="collapse" data-target="#navbarNavSup" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse margin-sm" id="navbarNavSup">
+          <br>
+          <br>
+          <div class="container">
+            <ul class="navbar-nav">
+              <button id="museums" type="button" class="btn-primary text-light p-md" onclick="displayMuseums()" >Museums</button>
+              <button id="crimes" type="button" class="btn-primary btn-success text-light p-md" onclick="toggleHeatmap()" >Show Crimes</button>
+              <button id="price" type="button" class="btn-primary text-light" onclick="calculatePricing()" >Pricing</button>
+
+          </ul>
+        </div>
+
+      </div>
+    </nav>
+  </div>
+
+
+
+  <div class="col-3  panel">
+    <br>
+    <div class="container rounded margin-top">
+      <h2 id="nameBoro"></h2>
+      <h4 id="numberCD"></h4>
+      <svg class="container rounded" id="barChart" width="100%" height="200px"></svg>
+
+      <br>
+
+
+
+      <div class="container col-8">
+        <h6>Number of Houses By Number of  Bedroom</h6>
+        <div class="pie">
 
         </div>
       </div>
-    </div>
-
-
-  </div>
-  <!-- Example split danger button -->
-  <div class="">
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary rounded-bottom">
-      <a class="navbar-brand "><strong>Filters</strong></a>
-
-      <button class="navbar-toggler"  type="button" data-toggle="collapse" data-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-
-      <div class="collapse navbar-collapse margin-sm" id="navbarNavDropdown">
-        <br>
-        <br>
+      <div id="Legend">
         <div class="container">
-          <ul class="navbar-nav">
-            <button id="distance" type="button" class="btn-primary text-light p-md" onclick="calculateDistance()" >Distance</button>
-            <button id="price" type="button" class="btn-primary text-light" onclick="calculatePricing()" >Pricing</button>
-            <button id="price" type="button" class="btn-primary text-light" onclick="calculatePricing()" >Pricing</button>
+          <h4>Legends</h4>
+          <svg id="" width="8%" height="8%" viewBox="0 0 10 10">
+            <rect x="0" y="0"  width="10" height="10"
+            style="fill:rgba(59, 255, 0, 0.5);stroke:rgba(59, 255, 0, 1);stroke-width:3;opacity:0.5" />
+          </svg>
+          <strong> Unlivable districts </strong>
+          <br>
+          <img src="https://i.imgur.com/PQwY47e.png?1" class="img-fluid" alt="Neighborhood">
+          <strong>  Neighborhood </strong>
+        </div>
 
-            <li class="nav-item">
-            </li>
-            <!-- <li  class="nav-item">
-            <a class="nav-link" href="#">Pricing</a>
-          </li> -->
-          <li class="nav-item dropdown ">
-            <a class="nav-link dropdown-toggle"  id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-              Decision tools
-            </a>
-            <div class="dropdown-menu bg-primary" aria-labelledby="navbarDropdownMenuLink">
-              <button id="crimes" type="button" class="btn-outline-primary btn-block text-light  p-md" onclick="toggleHeatmap()" >Show Crimes</button>
-              <!-- <a class="dropdown-item" href="#">walking</a>
-              <a class="dropdown-item" href="#">public transport</a> -->
-            </div>
-          </li>
-        </ul>
       </div>
-
     </div>
-  </nav>
-</div>
 
 
-
-<div class="col-3  panel">
-  <br>
-  <div class="container rounded margin-top">
-    <h2 id="nameBoro"></h2>
-    <h4 id="numberCD"></h4>
-    <svg class="container rounded" id="barChart" width="100%" height="200px"></svg>
-
-    <br>
-
-
-
-  <div class="container col-8">
-    <h6>Number of Houses By Number of  Bedroom</h6>
-    <div class="pie">
-
-    </div>
-  </div>
-  <div id="Legend">
-    <div class="container">
-      <h4>Legends</h4>
-      <svg id="" width="8%" height="8%" viewBox="0 0 10 10">
-        <rect x="0" y="0"  width="10" height="10"
-        style="fill:rgba(59, 255, 0, 0.5);stroke:rgba(59, 255, 0, 1);stroke-width:3;opacity:0.5" />
-      </svg>
-      <strong> Unlivable districts </strong>
-      <br>
-      <img src="https://i.imgur.com/PQwY47e.png?1" class="img-fluid" alt="Neighborhood">
-      <strong>  Neighborhood </strong>
-    </div>
 
   </div>
-</div>
-
-
-
-</div>
 </div>
 </div>
 

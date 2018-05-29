@@ -43,16 +43,15 @@ background-color: rgba(0, 0, 0,0.5);
 }
 
 #tooltip{
-  color: red;
+  color: #46DB7E;
   position: absolute;
-  background-color: blue;
   min-width: 80px;
-height: auto;
-background: none repeat scroll 0 0 #ffffff;
-border: 1px solid #6F257F;
-padding: 14px;
-text-align: center;
-cursor: pointer; 
+  height: auto;
+  background: rgba(25, 92, 50, 0.8);
+  border: 2px solid #66358F;
+  padding: 3px;
+  text-align: center;
+  cursor: pointer;
 }
 hr {
   margin-top: 1;
