@@ -8,6 +8,7 @@ CD is a  COMMUNITY DISTRICT
 [11] CD to which belongs(Orden inverted 12 is de 1 CD)
 */
 const SHAPECD = "https://services5.arcgis.com/GfwWNkhOj9bNBqoJ/arcgis/rest/services/nycd/FeatureServer/0/query?where=1=1&outFields=*&outSR=4326&f=geojson"
+const FARMERSMARKETS = "https://data.cityofnewyork.us/api/views/j8gx-kc43/rows.json?accessType=DOWNLOAD";
 /*
 features[i].properties.BoroCD  = 100 * BOROUGH + CD
 features[i].geometry.coordinates[j] = Coordinates of Shape
@@ -97,14 +98,24 @@ function neighborhoodToCD(neighborhood,numberBoro){
 		}
 	}
 }
-
+function CDfromPrecint( precint ){
+	if(precint < 40){
+		Manhattan
+	}else if(precint < 60){
+		bronx
+	}else if(precint < 100){
+		Brooklyn
+	}
+}
 function getCrimes(callback){
 
 	$.ajax({
 		url: "https://data.cityofnewyork.us/resource/fj84-7huk.json",
 	}).done(function(data){
+		console.log(data);
 		for (var i = 0; i < data.length; i++) {
 			crimeCoordinates.push(
+
 				new google.maps.LatLng(
 					data[i].latitude,
 					data[i].longitude
@@ -200,7 +211,7 @@ function setMarker(image,coordinates,textHover) {
 	marker.setMap(map);
 	return marker;
 }
-var lineSymbol = {
+var lineSymbol = {/*Line cofiuration to show path to University*/
 	path: 'M 0,-1 0,1',
 	strokeOpacity: 1,
 	scale: 4
@@ -403,8 +414,17 @@ function initMap() {
 		origin: new google.maps.Point(0, 0),
 		anchor: new google.maps.Point(25,45)
 	};
+markerNYU = setMarker(image,coordUniversity,'NYC University');
+	var infoNYU = new google.maps.InfoWindow({
+		content:"<h5>New York University</h5>",
 
-	setMarker(image,coordUniversity,'NYC University');
+	});
+	markerNYU.addListener('mouseover', function () {
+		infoNYU.open(map,markerNYU);
+	});
+	markerNYU.addListener('mouseout', function () {
+		infoNYU.close();
+	});
 	heatmap = new google.maps.visualization.HeatmapLayer({
 		data: crimeCoordinates,
 		map: map
@@ -601,7 +621,17 @@ class CommunityDistrict {
 				console.log(error);
 			})
 		}
+		function getFarmersMarkets(){
+		var data = $.get(FARMERSMARKETS,function(){})
+		.done(function(){
+			var responseJSON = JSON.parse(data.responseText);
+			console.log(responseJSON.data);
 
+
+		}).fail(function(error){
+			console.error(error);
+		});
+		}
 		function getHousingData(){
 			/*Como parametro podria tener la URL */
 			var data = $.get(HOUSEDATA,function(){})
@@ -712,7 +742,7 @@ class CommunityDistrict {
 
 		});
 
-		/*For bootstrap -Table*/
+		/*Formatters for bootstrap -Table*/
 		function runningFormatter(value, row, index) {
 			/*Change Text by Icons */
 			if( index == 0 ){
@@ -739,9 +769,9 @@ class CommunityDistrict {
 
 
 		/*SORT BY ACTIVE PARAMETERS*/
-		function updateTable(){
+		function updateTable(callback){
 
-			$('#table').bootstrapTable('updateRow', {index:0});
+
 			$('#table').bootstrapTable({
 				data:filteredCD,
 				showExport: true,
@@ -763,11 +793,8 @@ class CommunityDistrict {
 					$('#nameBoro').html(row.borough);
 					$('#numberCD').html("Community District : "+row.numberCD);
 
-					buildRing(row.bedroomUnits[0].value, row.numberUnits, "N Habitations "+ row.bedroomUnits[0].text, "#escRing");
+					//buildRing(row.bedroomUnits[0].value, row.numberUnits, "N Habitations "+ row.bedroomUnits[0].text, "#escRing");
 					drawChart(row.incomeUnits);
-					if(row.distanceCar != null){
-						$('#distanceAverage').html("Average distance by car to NYU: "+  Number(row.distanceCar).toFixed(2) + "Km");
-					}
 					directionsRenderer.setMap(null)
 					map.setCenter(row.neighborhoods[0].coorCenter);
 					map.setZoom(13);
@@ -782,9 +809,23 @@ class CommunityDistrict {
 			});
 
 			/*Update text in button to export table*/
+			callback();
 			$('.export .caret').html("Export To");
 			$('.keep-open .caret').html("Columns");
 
+		}
+
+		function showRow(){
+			if(preferenceDistance){
+				//$('#table').bootstrapTable('showColumn', 'dis');
+			}else{
+			//	$('#table').bootstrapTable('hideColumn', 'dis');
+			}
+			if(preferencePrice){
+				//$('#table').bootstrapTable('showColumn', 'price');
+			}else{
+			//	$('#table').bootstrapTable('showColumn', 'price');
+			}
 		}
 		/*FOR TEST
 		*/
@@ -903,11 +944,6 @@ class CommunityDistrict {
 		function sortByDistance(){
 
 			preferenceDistance = pressButton($('#distance'));
-			if(preferenceDistance){
-				$('#table').bootstrapTable('showColumn', 'dis');
-			}else{
-				$('#table').bootstrapTable('hideColumn', 'dis');
-			}
 			sortByPreferences();
 		}
 		async function calculatePricing(){
@@ -919,22 +955,17 @@ class CommunityDistrict {
 			$('#price').prop('disabled', false);
 			$('#price').removeClass("btn-warning");
 			document.getElementById("price").setAttribute('onclick','sortByPrice()');
-			$('#table').bootstrapTable('showColumn', 'dis');
 			sortByPrice();
 		}
 		function sortByPrice(){
 			preferencePrice = pressButton($('#price'));
-			if(preferencePrice){
-				$('#table').bootstrapTable('showColumn', 'price');
-			}else{
-				$('#table').bootstrapTable('hideColumn', 'price');
-			}
-			sortByPreferences();
-		}
 
-		function sortByPreferences(){
+			sortByPreferences();
+
+		}
+function sortByPreferences(){
 			filteredCD.sort(calculatePoints);
-			updateTable();
+			updateTable(showRow);
 		}
 
 
@@ -1024,24 +1055,14 @@ class CommunityDistrict {
 
 			/*Style personalization for the button*/
 			var controlUI = document.createElement('div');
-			controlUI.style.backgroundColor = 'rgb(102, 53, 143)';
-			controlUI.style.border = '2px solid rgb(68, 1, 127)';
-			controlUI.style.borderRadius = '10px';
-			controlUI.style.boxShadow = '0 4px 12px rgba(200,0,0,.3)';
-			controlUI.style.cursor = 'pointer';
-			controlUI.style.marginBottom = '22px';
-			controlUI.style.textAlign = 'center';
+			controlUI.classList.add("butStyle");
+
 			controlUI.title = 'Click to center map in NYU';
 			controlDiv.appendChild(controlUI);
 
 			/* Set CSS for the control interior.*/
 			var controlText = document.createElement('div');
-			controlText.style.color = 'rgb(255,255,255)';
-			controlText.style.fontFamily = 'Roboto,Arial,sans-serif';
-			controlText.style.fontSize = '16px';
-			controlText.style.lineHeight = '38px';
-			controlText.style.paddingLeft = '5px';
-			controlText.style.paddingRight = '5px';
+			controlText.classList.add("textButMap");
 			controlText.innerHTML = 'Go to New York University (NYU)';
 			controlUI.appendChild(controlText);
 
@@ -1051,115 +1072,186 @@ class CommunityDistrict {
 				map.setZoom(15);
 			});
 
+
 		}
 
 
 
 /*Pie chart */
+var data_V1 = [{
+  "Type": "A",
+  "Amount": 250,
+  "Description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent rutrum metus vel odio convallis condimentum. Integer ullamcorper ipsum vel dui varius congue. Nulla facilisi. Morbi molestie tortor libero, ac placerat urna mollis ac. Vestibulum id ipsum mauris."
+}, {
+  "Type": "B",
+  "Amount": 1000,
+  "Description": "In hac habitasse platea dictumst. Curabitur lacus neque, congue ac quam a, sagittis accumsan mauris. Suspendisse et nisl eros. Fusce nulla mi, tincidunt non faucibus vitae, aliquam vel dolor. Maecenas imperdiet, elit eget condimentum fermentum, sem lorem fringilla felis, vitae cursus lorem elit in risus."
+}, {
+  "Type": "C",
+  "Amount": 600,
+  "Description": "Aenean faucibus, risus sed eleifend rutrum, leo diam porttitor mauris, a eleifend ipsum ipsum ac ex. Nam scelerisque feugiat augue ac porta. Morbi massa ante, interdum sed nulla nec, finibus cursus augue. Phasellus nunc neque, blandit a nunc ut, mattis elementum arcu."
+}, {
+  "Type": "D",
+  "Amount": 1750,
+  "Description": "Aenean tellus felis, finibus eget placerat nec, ultrices vel elit. Morbi viverra mi ac ornare euismod. Quisque ultrices id nibh aliquam bibendum. Morbi id tortor non magna dictum suscipit. Nunc dolor metus, aliquam vitae felis id, euismod vulputate metus."
+}];
 
-var esc=1;
-var dtd=2;
-var exp=16;
+var data_V2 = [{
+  "Type": "E",
+  "Amount": 600,
+  "Description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent rutrum metus vel odio convallis condimentum. Integer ullamcorper ipsum vel dui varius congue. Nulla facilisi. Morbi molestie tortor libero, ac placerat urna mollis ac. Vestibulum id ipsum mauris."
+}, {
+  "Type": "F",
+  "Amount": 2000,
+  "Description": "In hac habitasse platea dictumst. Curabitur lacus neque, congue ac quam a, sagittis accumsan mauris. Suspendisse et nisl eros. Fusce nulla mi, tincidunt non faucibus vitae, aliquam vel dolor. Maecenas imperdiet, elit eget condimentum fermentum, sem lorem fringilla felis, vitae cursus lorem elit in risus."
+}, {
+  "Type": "G",
+  "Amount": 1500,
+  "Description": "Aenean faucibus, risus sed eleifend rutrum, leo diam porttitor mauris, a eleifend ipsum ipsum ac ex. Nam scelerisque feugiat augue ac porta. Morbi massa ante, interdum sed nulla nec, finibus cursus augue. Phasellus nunc neque, blandit a nunc ut, mattis elementum arcu."
+}, {
+  "Type": "H",
+  "Amount": 900,
+  "Description": "Aenean faucibus, risus sed eleifend rutrum, leo diam porttitor mauris, a eleifend ipsum ipsum ac ex. Nam scelerisque feugiat augue ac porta. Morbi massa ante, interdum sed nulla nec, finibus cursus augue. Phasellus nunc neque, blandit a nunc ut, mattis elementum arcu."
+}, {
+  "Type": "I",
+  "Amount": 1100,
+  "Description": "Aenean faucibus, risus sed eleifend rutrum, leo diam porttitor mauris, a eleifend ipsum ipsum ac ex. Nam scelerisque feugiat augue ac porta. Morbi massa ante, interdum sed nulla nec, finibus cursus augue. Phasellus nunc neque, blandit a nunc ut, mattis elementum arcu."
+}];
 
-buildRing(esc, 52, "Escalations", "#escRing");
-buildRing(dtd, 52, "DTDs", "#dtdRing");
-buildRing(exp, 52, "Expired", "#expRing");
+data = [{
+  "key": "data_V1",
+  "values": data_V1
+}, {
+  "key": "data_V2",
+  "values": data_V2
+}]
 
-function buildRing(num, total, label, target){
-  var dif = total - num;
-  var data = [
-    { group: label, count: num },
-    { group: "Systems", count: dif }
-  ]
+var width = parseInt(d3.select('#pieChart').style('width'), 10);
+var height = width;
+var radius = (Math.min(width, height) - 20) / 2;
 
-  var width  = 200,
-      height = 120,
-      offset = 25,
-      radius = Math.min(width, height) / 2;
+var type = function getObject(obj) {
+  types = [];
+  for (var i = 0; i < obj.length; i++) {
+    types.push(obj[i].Type);
+  }
+  return types
+};
 
-  var color = d3.scaleOrdinal(["#8a2bb1", "rgba(45, 48, 53,0.8)", "#CCE2EA", "#cccccc"])
-      //.range(["#65A6BF", "#9AC4D5", "#CCE2EA", "#cccccc"]);
+var pie = d3.layout.pie()
+  .value(function(d) {
+    return d.Amount;
+  })
+  .sort(null);
 
-  var arc = d3.arc()
-      .outerRadius(radius - 10)
-      .innerRadius(radius - 40);
+var arc = d3.svg.arc()
+  .outerRadius(radius - 10)
+  .innerRadius(150);
 
-  // second arc for labels
-  var arc2 = d3.arc()
-    .outerRadius(radius)
-    .innerRadius(radius + 24);
+var arcOver = d3.svg.arc()
+  .outerRadius(radius + 10)
+  .innerRadius(150);
 
-  var pie = d3.pie()
-      .sort(null)
-      .startAngle(1.1*Math.PI)
-      .endAngle(3.1*Math.PI)
-      .value(function(d) { return d.count; });
+var svg = d3.select("#pieChart").append("svg")
+  .attr("width", '100%')
+  .attr("height", '100%')
+  .attr('viewBox', '0 0 ' + Math.min(width, height) + ' ' + Math.min(width, height))
+  .attr('preserveAspectRatio', 'xMinYMin')
+  .append("g")
+  .attr("transform", "translate(" + radius + "," + height / 2 + ")");
 
-  var svg = d3.select(target).append("svg")
-      //.attr("id", target+"pie")
-      .attr("width", width + offset)
-      .attr("height", height + offset)
-      //.attr("float", "right")
-      //.attr('viewBox', '0 0 ' + width + offset +''+ width + offset)
-      .attr('perserveAspectRatio', 'xMinYMid')
-      .append("g")
-      .attr("transform", "translate(" + (width-offset)  + "," + (height + offset) / 2 + ")");
+var path = svg.selectAll("path");
 
-    data.forEach(function(d) {
-      d.count = +d.count;
+var label = d3.select("#dataSelection")
+  .data(data)
+  .on("change", changeData)
+  .filter(function(d, i) {
+  console.log(!i)
+    return !i;
+  })
+  .each(changeData)
+
+changeText = function(text, textID) {
+  d3.select(textID)
+    .text(text)
+};
+
+change = function(d, i) {
+  var angle = 90 - ((d.startAngle * (180 / Math.PI)) + ((d.endAngle - d.startAngle) * (180 / Math.PI) / 2))
+  svg.transition()
+    .duration(1000)
+    .attr("transform", "translate(" + radius + "," + height / 2 + ") rotate(" + angle + ")")
+  d3.selectAll("path")
+    .transition()
+    .attr("d", arc)
+  d3.select(i)
+    .transition()
+    .duration(1000)
+    .attr("d", arcOver)
+};
+
+function changeData() {
+  var selectedData = data[this.selectedIndex]
+  var color = d3.scale.ordinal()
+  .domain(type(selectedData.values))
+  .range(["#8A76A6", "#54B5BF", "#8EA65B", "#F27B35", "#BF4539"]);
+
+  var data1 = pie(selectedData.values);
+  var dataText = [selectedData.key];
+
+  path = path.data(data1)
+
+  path.enter().append("path")
+    .each(function(d) {
+      this._current = {
+        startAngle: d.endAngle,
+        endAngle: d.endAngle
+      };
+    })
+    .attr("fill", function(d) {
+      return color(d.data.Type);
+    })
+    .on("click", function(d) {
+      var titleText = d.data.Type + ": " + d.data.Amount;
+      var blockText = d.data.Description;
+
+      changeText(titleText, "#segmentTitle");
+      changeText(blockText, "#segmentText");
+      change(d, this);
     });
+  path.exit()
+    .datum(function(d, i) {
+      return {
+        startAngle: d.endAngle,
+        endAngle: d.endAngle
+      };
+    })
+    .transition()
+    .duration(750)
+    .attrTween("d", arcTween)
+    .remove();
+  path.transition()
+    .duration(750)
+    .attrTween("d", arcTween);
 
-    var g = svg.selectAll(".arc")
-        .data(pie(data))
-        .enter().append("g")
-        .attr("class", "arc");
+  $('.text-container').hide();
+  $('#segmentTitle').replaceWith('<h1 id="segmentTitle">Select Segment</h1>');
+  $('#')
+  $('#segmentText').replaceWith('<p id="segmentText">Lots of text...</p>');
+  $('.text-container').fadeIn(400);
 
-    g.append("path")
-        .style("fill", function(d) { return color(d.data.group); })
-        .transition().delay(function(d, i) { return i * 500; }).duration(500)
-        .attrTween('d', function(d) {
-           var i = d3.interpolate(d.startAngle+0.1, d.endAngle);
-           return function(t) {
-             d.endAngle = i(t);
-             return arc(d);
-           };
-        })
-        //.on("mouseover", function(){return tooltip.style("visibility", "visible");})
-        //.on("mousemove", function(){return tooltip.style("top",
-            //(d3.event.pageY-10)+"px").style("left",(d3.event.pageX+10)+"px");})
-        //.on("mouseout", function(){return tooltip.style("visibility", "hidden");});
-        //.append("svg:title")
-        //.text( function(d) { return d.count } )
+};
 
-    g.append("text")
-        .attr("transform", function(d) { return "translate(" + arc2.centroid(d) + ")"; })
-        .attr("dy", ".35em")
-        .attr("class", "d3-label")
-        .style("text-anchor", "middle")
-        .text(function(d) { return d.data.count; });
-
-    g.append("text")
-        .attr("class", "pie-total")
-        //.attr('dx', "-18px")
-        .attr('dy', '8px')
-        .attr('text-anchor', 'middle')
-        .text( num +" "+ label )
-				.style("fill","white")
-				.attr("transform", "translate("+-120+",0)")
-        .attr('class', 'd3-label-total');
-
-  // var aspect = width / height,
-  //     chart = $("#pie");
-  // $(window).on("resize", function() {
-  //     var targetWidth = Math.min(width + offset, chart.parent().width());
-  //     chart.attr("width", targetWidth);
-  //     chart.attr("height", targetWidth / aspect);
-  // }).trigger('resize');
-
-  var tooltip = d3.select("body")
-    .append("div")
-    .style("position", "absolute")
-    .style("z-index", "10")
-    .style("visibility", "hidden")
-    .text("a simple tooltip");
+function key(d) {
+  return d.data.Type;
 }
+
+function arcTween(d) {
+  var i = d3.interpolate(this._current, d);
+  this._current = i(0);
+  return function(t) {
+    return arc(i(t));
+  };
+}
+
+document.querySelector('style').textContent += '@media(max-width:767px) {#pieChart { transform: rotate(90deg); transform-origin: 50% 50%; transition: 1s; max-width: 50%; } .text-container { width: 100%; min-height: 0; }} @media(min-width:768px) {#pieChart { transition: 1s;}}'

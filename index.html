@@ -158,7 +158,6 @@
 
               <table id="table"
 
-
               class="table table-sm"
               data-click-to-select="true"
               data-classes="table table-no-bordered"
@@ -169,9 +168,12 @@
                   <th data-formatter="runningFormatter">Position</th>
                   <th data-field="borough">District</th>
                   <th data-field="numberCD">CD N°</th>
+
                   <th data-field="dis" data-formatter="distanceInKm" data-visible="false">Distance Km</th>
                   <th data-field="price" data-formatter="numberUnits" data-visible="false">Disponible Houses</th>
+                  <th data-field="bedroom0" data-formatter="numberUnits" data-visible="false">Houses With 0 bedroomUnits</th>
                 </tr>
+
               </thead>
             </table>
             <!-- </div> -->
@@ -234,16 +236,26 @@
     <svg class="container rounded" id="barChart" width="100%" height="200px"></svg>
 
     <br>
-    <strong id="distanceAverage">Distance Variable</strong>
-    <div id="charts">
 
-      <div id="escRing" class="ring"></div>
-      <div id="dtdRing" class="ring"></div>
-      <div id="expRing" class="ring"></div>
+    <div id="Legend">
+      <div class="container">
+        <h4>Legends</h4>
+        <svg id="" width="8%" height="8%" viewBox="0 0 10 10">
+          <rect x="0" y="0"  width="10" height="10"
+          style="fill:rgba(59, 255, 0, 0.5);stroke:rgba(59, 255, 0, 1);stroke-width:3;opacity:0.5" />
+        </svg>
+        <strong> Unlivable districts </strong>
+        <br>
+        <img src="https://i.imgur.com/PQwY47e.png?1" class="img-fluid" alt="Neighborhood">
+        <strong>  Neighborhood </strong>
+      </div>
+
     </div>
   </div>
 
+  <div class="chart">
 
+  </div>
 
 </div>
 </div>
