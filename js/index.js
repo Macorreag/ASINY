@@ -439,7 +439,7 @@ function initMap() {
 	};
 	markerNYU = setMarker(image,coordUniversity,'NYC University');
 	var infoNYU = new google.maps.InfoWindow({
-		content:"<h5>New York University</h5>",
+		content:"<h5>New York University</h5> <p>New York University (NYU) is a private nonprofit <br> research university based in New York City.<br> Founded in 1831</p>",
 
 	});
 	markerNYU.addListener('mouseover', function () {
@@ -661,21 +661,6 @@ class CommunityDistrict {
 			})
 		}
 		/*For manage museums*/
-/*		function toggleArray(image,array,variableToggle){
-			if(variableToggle){
-				museumDisplay = [];
-				for (var i =0 ;i < museumsArray.length ; i++){
-					var into = setMarker(imageMuseum, museumsArray[i].coordinates, museumsArray[i].name);
-					museumDisplay.push(into);
-				}
-				museumActive = false;
-			}else{
-				for (var i =0 ;i < museumDisplay.length ; i++){
-					museumDisplay[i].setMap(null);
-				}
-				museumActive = true;
-			}
-		}*/
 		function displayMuseums(){
 			var imageMuseum = {
 				url: 'https://i.imgur.com/gKRiI1K.png',
@@ -683,20 +668,21 @@ class CommunityDistrict {
 				origin: new google.maps.Point(0, 0),
 				anchor: new google.maps.Point(15.5,15.5)
 			};
+				museumActive = pressButton($("#museums"));
 			if(museumActive){
 				museumDisplay = [];
 				for (var i =0 ;i < museumsArray.length ; i++){
 					var into = setMarker(imageMuseum, museumsArray[i].coordinates, museumsArray[i].name);
 					museumDisplay.push(into);
 				}
-				museumActive = false;
+				//museumActive = false;
 			}else{
 				for (var i =0 ;i < museumDisplay.length ; i++){
 					museumDisplay[i].setMap(null);
 				}
-				museumActive = true;
+				//museumActive = true;
 			}
-			pressButton($("#museums"));
+
 		}
 		function  getGalleries(){
 			var data = $.get(GALLERIES,function(){})
@@ -723,19 +709,17 @@ class CommunityDistrict {
 				origin: new google.maps.Point(0, 0),
 				anchor: new google.maps.Point(15.5,15.5)
 			};
-			gallerieActive = pressButton($("#gallerie"));
+			gallerieActive = pressButton($("#gallery"));
 			if(gallerieActive){
 				gallerieDisplay = [];
 				for (var i =0 ;i < galleriesArray.length ; i++){
 					var into = setMarker(imageGallery, galleriesArray[i].coordinates, galleriesArray[i].name);
 					gallerieDisplay.push(into);
 				}
-				gallerieActive = false;
 			}else{
 				for (var i =0 ;i < gallerieDisplay.length ; i++){
 					gallerieDisplay[i].setMap(null);
 				}
-				gallerieActive = true;
 			}
 
 		}
@@ -858,9 +842,6 @@ class CommunityDistrict {
 			getMuseums();
 			getGalleries();
 
-
-
-
 		});
 
 		/*Formatters for bootstrap -Table*/
@@ -877,6 +858,7 @@ class CommunityDistrict {
 			}
 			return '<div class="text-center"><strong align="center" style="margin:auto">'+ (index + 1)+'</strong></div>';
 		}
+		/*Simple solution for rows in Table Work to solucionate*/
 		function distanceInKm(value, row, index){
 			return Number(row.distanceCar).toFixed(2) + "Km";
 		}
@@ -945,31 +927,19 @@ class CommunityDistrict {
 							neigMarkActive[i].setVisible(false);
 						}
 					};
-					console.log(row);
 					$element.css({backgroundColor: row.color});
 					shapeActive = row.draw(row.color);
 					neigMarkActive = row.drawNB();
 					$('#nameBoro').html(row.borough);
 					$('#numberCD').html("Community District : "+row.numberCD);
-
-					//buildRing(row.bedroomUnits[0].value, row.numberUnits, "N Habitations "+ row.bedroomUnits[0].text, "#escRing");
 					drawChart(row.incomeUnits);
 					drawPie(row.bedroomUnits);
 					directionsRenderer.setMap(null);
 					map.setCenter(row.neighborhoods[0].coorCenter);
 					map.setZoom(13);
 				},
-				//pageList:false,
-
-
-				//onlyInfoPagination:true,
-				//rememberOrder:true,
-				//pagination:true,
-				//checkbox: true,
 			});
-
 			/*Update text in button to export table*/
-
 			$('.export .caret').html("Export To");
 			$('.keep-open .caret').html("Columns");
 
@@ -1087,7 +1057,6 @@ class CommunityDistrict {
 			sortByDistance();
 		}
 		function sortByDistance(){
-
 			preferenceDistance = pressButton($('#distance'));
 			sortByPreferences();
 		}
