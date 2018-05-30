@@ -10,14 +10,14 @@
 
   <!--Se puede definir los tipos de estilos para cada pantalla especifica media="screen and (device-height: 600px)" -->
   <!--llamado a bootstrap 4 version min -->
-
+  <link rel="shortcut icon" href="https://www.gnu.org/favicon.ico" />
   <script  src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js"></script>
   <link
   href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" >
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.12.1/bootstrap-table.min.css">
-  <script  src="https://code.jquery.com/jquery-3.3.1.js" ></script>
+  <script  src="https://code.jquery.com/jquery-3.3.1.min.js" ></script>
   <!--PAsar a CVS-->
-  <script  src="https://d3js.org/d3.v5.js"></script>
+  <script  src="https://d3js.org/d3.v5.min.js"></script>
 
   <script  src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
   <!-- Latest compiled and minified CSS -->
@@ -199,54 +199,65 @@
             <ul class="navbar-nav">
               <button id="museums" type="button" class="btn-primary text-light p-md" onclick="displayMuseums()" >Museums</button>
               <button id="crimes" type="button" class="btn-primary btn-success text-light p-md" onclick="toggleHeatmap()" >Show Crimes</button>
-              <button id="price" type="button" class="btn-primary text-light" onclick="calculatePricing()" >Pricing</button>
+              <button id="gallerie" type="button" class="btn-primary text-light p-md" onclick="displayGalleries()" >Galleries</button>
+              <button id="unlivableCD" type="button" class="btn-primary btn-success text-light" onclick="toggleunlivableCD()" >Districts not habitable</button>
 
-          </ul>
-        </div>
-
-      </div>
-    </nav>
-  </div>
-
-
-
-  <div class="col-3  panel">
-    <br>
-    <div class="container rounded margin-top">
-      <h2 id="nameBoro"></h2>
-      <h4 id="numberCD"></h4>
-      <svg class="container rounded" id="barChart" width="100%" height="200px"></svg>
-
-      <br>
-
-
-
-      <div class="container col-8">
-        <h6>Number of Houses By Number of  Bedroom</h6>
-        <div class="pie">
+            </ul>
+          </div>
 
         </div>
-      </div>
-      <div id="Legend">
-        <div class="container">
-          <h4>Legends</h4>
-          <svg id="" width="8%" height="8%" viewBox="0 0 10 10">
-            <rect x="0" y="0"  width="10" height="10"
-            style="fill:rgba(59, 255, 0, 0.5);stroke:rgba(59, 255, 0, 1);stroke-width:3;opacity:0.5" />
-          </svg>
-          <strong> Unlivable districts </strong>
-          <br>
-          <img src="https://i.imgur.com/PQwY47e.png?1" class="img-fluid" alt="Neighborhood">
-          <strong>  Neighborhood </strong>
-        </div>
-
-      </div>
+      </nav>
     </div>
 
 
 
+    <div class="col-3  panel">
+      <br>
+      <div class="container rounded margin-top">
+        <h2 id="nameBoro"></h2>
+        <h4 id="numberCD"></h4>
+        <svg class="container rounded" id="barChart" width="100%" height="200px"></svg>
+
+        <br>
+
+
+        <h4 class="centered">Number of Houses <br> By Number of  Bedroom</h4>
+        <div class="container col-8">
+          <div class="pie">
+
+          </div>
+        </div>
+        <div id="Legend">
+          <div class="container">
+            <h4>Legends</h4>
+            <svg id="" width="8%" height="8%" viewBox="0 0 10 10">
+              <rect x="0" y="0"  width="10" height="10"
+              style="fill:rgba(59, 255, 0, 0.5);stroke:rgba(59, 255, 0, 1);stroke-width:3;opacity:0.5" />
+            </svg>
+            <strong> Unlivable districts </strong>
+            <br>
+            <img src="https://i.imgur.com/PQwY47e.png?1" class="img-fluid" alt="Neighborhood">
+            <strong>  Neighborhood </strong>
+            <br>
+            <img src="https://i.imgur.com/gKRiI1K.png" class="img-fluid" alt="Museum">
+            <strong>  Museum </strong>
+            <div >
+              <svg height="30" width="30">
+                <g fill="#FF0000" stroke="red"  stroke-width="4">
+                  <path stroke-dasharray="5,5" d="M5 20 l215 0" />
+                </g>
+              </svg>
+              <strong> Best route </strong>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+
+
+    </div>
   </div>
-</div>
 </div>
 
 <script type="text/javascript" src="js/index.js"></script>

@@ -47,8 +47,8 @@ background-color: rgba(0, 0, 0,0.5);
   position: absolute;
   min-width: 80px;
   height: auto;
-  background: rgba(25, 92, 50, 0.8);
-  border: 2px solid #66358F;
+  background: rgba(0, 0, 0, 0.9);
+  border: 2px solid #46DB7E;
   padding: 3px;
   text-align: center;
   cursor: pointer;
@@ -189,3 +189,5 @@ rect.disabled {                              /* NEW */
 .arc path {
   stroke: #fff;
 }
+
+/**/

@@ -9,7 +9,8 @@ CD is a  COMMUNITY DISTRICT
 */
 const SHAPECD = "https://services5.arcgis.com/GfwWNkhOj9bNBqoJ/arcgis/rest/services/nycd/FeatureServer/0/query?where=1=1&outFields=*&outSR=4326&f=geojson"
 const FARMERSMARKETS = "https://data.cityofnewyork.us/api/views/j8gx-kc43/rows.json?accessType=DOWNLOAD";
-const MUSEUMS = "https://data.cityofnewyork.us/api/views/fn6f-htvy/rows.json?accessType=DOWNLOAD"
+const MUSEUMS = "https://data.cityofnewyork.us/api/views/fn6f-htvy/rows.json?accessType=DOWNLOAD";
+const GALLERIES = "https://data.cityofnewyork.us/api/views/43hw-uvdj/rows.json?accessType=DOWNLOAD";
 /*
 features[i].properties.BoroCD  = 100 * BOROUGH + CD
 features[i].geometry.coordinates[j] = Coordinates of Shape
@@ -33,6 +34,7 @@ var borough=[];
 var crimeCoordinates = [];
 var unlivableDistricts = [];
 var museumsArray = [];
+var galleriesArray = [];
 
 /*Variables for GMaps*/
 var map;
@@ -41,11 +43,14 @@ var heatmap;
 var directionsService;
 var directionsRenderer;
 var museumDisplay = [];
+var gallerieDisplay = [];
 
 /*tools Activate*/
 var crimeMapActive = false;
 /*ranking variables*/
 var museumActive = false;
+var gallerieActive = false;
+var unlivableCD = true;
 var maxDistance = 0;
 var preferenceDistance = false;
 var preferencePrice = false;
@@ -130,10 +135,21 @@ function getCrimes(callback){
 		document.getElementById("crimes").setAttribute('onclick','toggleHeatmap()')
 		callback();
 	});
-
-
 	return crimeCoordinates;
-
+}
+function toggleunlivableCD(){
+	if(unlivableCD){
+		for(var i= 0 ; i < unlivableDistricts.length ;i++){
+			unlivableDistricts[i].setVisible(false);
+		}
+		unlivableCD = false;
+	}else{
+		for(var i= 0 ; i < unlivableDistricts.length ;i++){
+			unlivableDistricts[i].setVisible(true);
+		}
+		unlivableCD = true;
+	}
+	pressButton($('#unlivableCD'))
 }
 function getDataShapeDistric(callback){
 	/*Organize DataSets of borough */
@@ -184,8 +200,9 @@ function getDataShapeDistric(callback){
 				filteredCD.push(communityDistrict);
 				communityDistrict.draw( "rgba(0, 0, 0, 0)" );
 			}else{
-				unlivableDistricts.push(communityDistrict);
-				communityDistrict.draw(communityDistrict.color);
+				unlivableDistricts.push(
+					communityDistrict.draw(communityDistrict.color)
+				);
 				communityDistrict.infowindow("<div class=\"infoIna\"><h5> CommunityDistrict:"+responseJSON.features[i].properties.BoroCD+"</h5>No habitable </div>");
 			}
 			geoCD[numberBorough(responseJSON.features[i].properties.BoroCD)].push(communityDistrict);
@@ -403,6 +420,7 @@ function initMap() {
 		polylineOptions: {
 			strokeOpacity: 0.5,
 			strokeWeight: 6,
+			strokeColor: '#FF0000',
 			icons: [{
 				icon: lineSymbol,
 				offset: '0',
@@ -468,7 +486,6 @@ class Neighborhood {
 			anchor: new google.maps.Point(15.5,15.5)
 		};
 		if(this.distanceCar.length > 0){
-			console.log(this.distanceCar[0]);
 			this._info = "<div class=\"infoNeigh\"><h5>"+this._name+"</h5>Neighborhood <p>Distance To NYU :"+ (this.distanceCar[0]/1000).toFixed(2) +" Km</p></div>";
 		}else{
 			this._info = "<div class=\"infoNeigh\"><h5>"+this._name+"</h5>Neighborhood <p>"+"</p></div>";
@@ -481,7 +498,6 @@ class Neighborhood {
 		});
 		marker.addListener('click', function () {
 			infowindow.open(map,marker);
-			console.log(coor);
 			getRoute(coor);
 
 		});
@@ -628,7 +644,6 @@ class CommunityDistrict {
 		function getMuseums(){
 			var data = $.get(MUSEUMS, () => {})
 			.done(function () {
-				console.log("asa");
 				for (var i = 0; i < data.responseJSON.data.length; i++){
 					var museum = {
 						"coordinates" : coordinateGmaps(data.responseJSON.data[i][8]),
@@ -640,15 +655,27 @@ class CommunityDistrict {
 					museumsArray.push(museum);
 				}
 				museumActive = true;
-				//callback();
-				document.getElementById("museums").setAttribute('onclick','displayMuseums()')
-
 			})
 			.fail(function (error) {
 				console.error(error);
 			})
 		}
 		/*For manage museums*/
+/*		function toggleArray(image,array,variableToggle){
+			if(variableToggle){
+				museumDisplay = [];
+				for (var i =0 ;i < museumsArray.length ; i++){
+					var into = setMarker(imageMuseum, museumsArray[i].coordinates, museumsArray[i].name);
+					museumDisplay.push(into);
+				}
+				museumActive = false;
+			}else{
+				for (var i =0 ;i < museumDisplay.length ; i++){
+					museumDisplay[i].setMap(null);
+				}
+				museumActive = true;
+			}
+		}*/
 		function displayMuseums(){
 			var imageMuseum = {
 				url: 'https://i.imgur.com/gKRiI1K.png',
@@ -659,17 +686,8 @@ class CommunityDistrict {
 			if(museumActive){
 				museumDisplay = [];
 				for (var i =0 ;i < museumsArray.length ; i++){
-					var marker = new google.maps.Marker({
-						position:museumsArray[i].coordinates,
-						map: map,
-						/*Mapa donde se colocara el marker*/
-						icon: imageMuseum,
-						title: museumsArray[i].name,
-						/*Text show in event Hover*/
-						zIndex: 100
-					});
-					marker.setMap(map);
-					museumDisplay.push(marker);
+					var into = setMarker(imageMuseum, museumsArray[i].coordinates, museumsArray[i].name);
+					museumDisplay.push(into);
 				}
 				museumActive = false;
 			}else{
@@ -680,7 +698,47 @@ class CommunityDistrict {
 			}
 			pressButton($("#museums"));
 		}
+		function  getGalleries(){
+			var data = $.get(GALLERIES,function(){})
+			.done(function(){
+				var responseJSON = JSON.parse(data.responseText);
+				for (var i = 0; i < data.responseJSON.data.length; i++){
+					var gallery = {
+						"coordinates" : coordinateGmaps(data.responseJSON.data[i][9]),
+						"name"  : data.responseJSON.data[i][8],
+						"number" : data.responseJSON.data[i][10],
+						"WebPage" : data.responseJSON.data[i][11],
+					};
+					galleriesArray.push(gallery);
+				}
 
+			}).fail(function(error){
+				console.error(error);
+			});
+		}
+		function  displayGalleries(){
+			var imageGallery = {
+				url: 'https://i.imgur.com/2vdYiIt.png',
+				size: new google.maps.Size(32, 32),
+				origin: new google.maps.Point(0, 0),
+				anchor: new google.maps.Point(15.5,15.5)
+			};
+			gallerieActive = pressButton($("#gallerie"));
+			if(gallerieActive){
+				gallerieDisplay = [];
+				for (var i =0 ;i < galleriesArray.length ; i++){
+					var into = setMarker(imageGallery, galleriesArray[i].coordinates, galleriesArray[i].name);
+					gallerieDisplay.push(into);
+				}
+				gallerieActive = false;
+			}else{
+				for (var i =0 ;i < gallerieDisplay.length ; i++){
+					gallerieDisplay[i].setMap(null);
+				}
+				gallerieActive = true;
+			}
+
+		}
 
 		function getFarmersMarkets(){
 			var data = $.get(FARMERSMARKETS,function(){})
@@ -798,6 +856,7 @@ class CommunityDistrict {
 			getCrimes(toggleHeatmap);
 			$('#ModalWelcome').modal('show');
 			getMuseums();
+			getGalleries();
 
 
 
@@ -1120,30 +1179,33 @@ class CommunityDistrict {
 			.data(theData);
 
 			/*Draw bars with exact size*/
-			bars.enter().append("rect")
-			.attr("class", "bar")
-			.attr("x", function (d) { return x(d.text); })
-			.attr("y", function (d) { return y(d.value); })
-			.attr("width", x.bandwidth())
-			.attr("height", function (d) { return height - y(d.value); })
-			.on("mouseover", function(d){
 
-				tooltip.style("visibility", "visible")
-				.html("There are <h3> "+d.value+"</h3>  houses that has a price "+ d.text)
-				;})
-				.on("mousemove", function(){
-					tooltip.style("top", (event.pageY-10)+"px").style("left",(event.pageX+10)+"px")
+
+				bars.enter().append("rect")
+				.attr("class", "bar")
+				.attr("x", function (d) { return x(d.text); })
+				.attr("y", function (d) { return y(d.value); })
+				.attr("width", x.bandwidth())
+				.attr("height", function (d) { return height - y(d.value); })
+				.on("mouseover", function(d){
+					tooltip.style("visibility", "visible")
+					.html("There are <h3> "+d.value+"</h3>  houses that has a price "+ d.text)
 					;})
-					.on("mouseout", function(){
-						tooltip.style("visibility", "hidden");
-					});
-					;
-					/*Insert New Data*/
-					bars.attr("x", function (d) { return x(d.text); })
-					.attr("y", function (d) { return y(d.value); })
-					.attr("width", x.bandwidth())
-					.attr("height", function (d) { return height - y(d.value); })
-					bars.exit().remove();
+					.on("mousemove", function(){
+						tooltip.style("top", (event.pageY-10)+"px").style("left",(event.pageX+10)+"px")
+						;})
+						.on("mouseout", function(){
+							tooltip.style("visibility", "hidden");
+						});
+						;
+						/*Insert New Data*/
+						bars.attr("x", function (d) { return x(d.text); })
+						.attr("y", function (d) { return y(d.value); })
+						.attr("width", x.bandwidth())
+						.attr("height", function (d) { return height - y(d.value); })
+						bars.exit().remove();
+
+
 				}
 				/*barChart end*/
 
