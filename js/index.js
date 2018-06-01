@@ -161,6 +161,7 @@ function getDataShapeDistric(callback){
 			var communityDistrict;
 			var subShape = [];
 			var multiPolygon = false;
+			console.log(responseJSON.features[i].geometry.type);
 			if (responseJSON.features[i].geometry.type == "MultiPolygon") {
 				for (var j = 0; j < responseJSON.features[i].geometry.coordinates.length; j++) {
 					for (var g = 0; g < responseJSON.features[i].geometry.coordinates[j].length; g++) {
