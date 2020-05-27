@@ -260,12 +260,12 @@
   </div>
 </div>
 
-<script type="text/javascript" src="js/index.js"></script>
+<script type="text/javascript" src="js/index.js">
+  key_maps = process.env['KEY_MAPS'];
+  console.log(key_maps);
+  </script>
 <!--Cargar la API de google maps de forma Asincrona*/-->
-<script async defer 
-        key_maps = process.env['KEY_MAPS'];
-        console.log(key_maps);
-        src="https://maps.googleapis.com/maps/api/js?key=" + key_maps + "&v=3&libraries=geometry,visualization&callback=initMap&language=en">
+<script async defer src="https://maps.googleapis.com/maps/api/js?key=" + key_maps + "&v=3&libraries=geometry,visualization&callback=initMap&language=en">
 </script>
 <!--Cargamos de ultimas el javascript para no interrumpir la carga de la pagina-->
 
