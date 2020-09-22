@@ -1,0 +1,28 @@
+{
+  "name": "asiny",
+  "version": "1.0.0",
+  "description": "Map to fied better site in New York",
+  "main": "index.js",
+  "scripts": {
+    "test": "node index.js",
+    "build": "node index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Macorreag/ASINY.git"
+  },
+  "keywords": [
+    "Open",
+    "Data",
+    "API"
+  ],
+  "author": "Macorreag",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Macorreag/ASINY/issues"
+  },
+  "homepage": "https://github.com/Macorreag/ASINY#readme",
+  "dependencies": {
+    "express": "^4.17.1"
+  }
+}
