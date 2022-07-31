@@ -121,6 +121,10 @@ Fill in the structued description:
 Hi! I'm your first Markdown file in **StackEdit**. If you want to learn about StackEdit, you can read me. If you want to play with Markdown, you can edit me. If you have finished with me, you can just create new files by opening the **file explorer** on the left corner of the navigation bar.
 
 
+## Awards
+
+Este proyecto consiste en una aplicación Web que logro conectar y publicar información pública mediante un mapa para facilitar el acceso de las personas a mejores viviendas en la ciudad de Nueva York. El proyecto fue premiado debido a la facilidad de uso que tiene el aplicativo y además a la rapidez de desarrollo ya que el proyecto se culmino en tan solo 1 mes.
+
 # Files
 
 StackEdit stores your files in your browser, which means all your files are automatically saved locally and are accessible **offline!**
